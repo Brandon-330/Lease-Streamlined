@@ -1,5 +1,5 @@
 -- Determine name of renters and if they are active or past renters
-CREATE TABLE renters (
+CREATE TABLE tenants (
   id serial PRIMARY KEY,
   name text NOT NULL,
   status boolean DEFAULT true
@@ -20,7 +20,7 @@ CREATE TABLE addresses (
 CREATE TABLE properties (
   id serial PRIMARY KEY,
   rent NUMERIC(6, 2) NOT NULL,
-  renter_id int REFERENCES renters(id) UNIQUE,
+  tenant_id int REFERENCES tenants(id) UNIQUE,
   address_id int REFERENCES addresses(id) ON DELETE CASCADE UNIQUE NOT NULL
 );
 
@@ -33,5 +33,5 @@ CREATE TABLE payments (
   amount NUMERIC(6, 2) NOT NULL,
   transaction_date date DEFAULT NOW() NOT NULL,
   property_id int REFERENCES properties(id) ON DELETE CASCADE NOT NULL,
-  renter_id int REFERENCES renters(id) NOT NULL
+  tenant_id int REFERENCES tenants(id) NOT NULL
 );

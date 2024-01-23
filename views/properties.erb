@@ -1,0 +1,14 @@
+<h1>Rental Properties</h1>
+
+<ul>
+  <% @properties.each do |property| %>
+    <li>
+      <a href='/properties/<%= property[:id] %>'>
+        <h2><%= property[:address] %></h2>
+        <p>
+          Rent left: <%= property[:rent] %> by <%= property[:tenant] %>
+        </p>
+      </a>
+    </li>
+  <% end %>
+</ul>  
