@@ -5,6 +5,7 @@ class Database
     @db = PG.connect(dbname: 'rental_management', user: 'postgres', password: 'postgres')
   end
 
+  # CONTINUE HERE
   def find_property(id)
     sql = <<~SQL
     SELECT p.id, p.rent, pmt.amount, pmt.transaction_date, a.house_number || ' ' || a.street 
