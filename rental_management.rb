@@ -11,6 +11,14 @@ end
 helpers do 
   def sort_properties(properties, &block)
     sorted_properties_by_rent = properties.sort_by { |property| property[:rent] }
+
+    sorted_properties_by_rent.each(&block)
+  end
+
+  def load_property(id)
+    @storage.find_property(id)
+
+    session[:error] = 'Invalid property selected'
   end
 end
 
@@ -23,6 +31,11 @@ get '/' do
 end
 
 get '/properties' do
-  @rental_properties = @storage.all_properties
+  @properties = @storage.all_properties
   erb :properties
+end
+
+get '/properties/:id' do
+  id = params[:id]
+  @property = load_property(id)
 end

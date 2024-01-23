@@ -1,14 +1,16 @@
 <h1>Rental Properties</h1>
 
 <ul>
-  <% @properties.each do |property| %>
+  <% sort_properties(@properties) do |property| %>
     <li>
       <a href='/properties/<%= property[:id] %>'>
         <h2><%= property[:address] %></h2>
-        <p>
-          Rent left: <%= property[:rent] %> by <%= property[:tenant] %>
-        </p>
       </a>
+      <% if property[:tenant] %>
+        <p>Rent left: <%= property[:rent] %> by tenant: <%= property[:tenant] %>
+      <% else property[:tenant] %>
+        <p>Rent amount: <%= property[:rent] %> <b style='text-decoration: underline;'>vancant</b></p>
+      <% end %>
     </li>
   <% end %>
 </ul>  
