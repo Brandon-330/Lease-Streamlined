@@ -5,20 +5,19 @@ class Database
     @db = PG.connect(dbname: 'rental_management', user: 'postgres', password: 'postgres')
   end
 
-  # CONTINUE HERE
+  # NOT WORKING
   def find_property(id)
     sql = <<~SQL
     SELECT p.id, p.rent, pmt.amount, pmt.transaction_date, a.house_number || ' ' || a.street 
     || ', ' || a.city || ', ' || a.state || ' ' || a.zip_code AS address, t.name
     FROM properties AS p
+    WHERE p.id = 1
     JOIN tenants AS t
     ON t.id = p.tenant_id
     JOIN addresses AS a
     ON a.id = p.address_id
     JOIN payments AS pmt
     ON p.id = pmt.property_id
-    GROUP BY p.id
-    HAVING p.id = $1
     SQL
 
     result = query(sql, id)

@@ -10,15 +10,13 @@ end
 
 helpers do 
   def sort_properties(properties, &block)
-    sorted_properties_by_rent = properties.sort_by { |property| property[:rent] }
+    sorted_properties_by_rent = properties.sort { |property_a, property_b| property_b[:rent] <=> property_a[:rent] }
 
     sorted_properties_by_rent.each(&block)
   end
 
   def load_property(id)
     @storage.find_property(id)
-
-    session[:error] = 'Invalid property selected'
   end
 end
 
@@ -35,7 +33,34 @@ get '/properties' do
   erb :properties
 end
 
+get '/users/signin' do
+  erb :signin
+end
+
+# ENCRYPT PASSWORD
+post '/users/signin' do
+  username = params[:username]
+  password = params[:password]
+
+  if username == 'admin' && password == 'secret'
+    session[:username] = username
+    redirect '/'
+  else
+    session[:message] = 'Invalid credentials'
+    status 422
+    erb :signin
+  end
+end
+
+post '/users/signout' do
+  session.delete(:username)
+
+  redirect '/'
+end
+
+# WORK ON THIS
 get '/properties/:id' do
   id = params[:id]
   @property = load_property(id)
+  erb :property
 end

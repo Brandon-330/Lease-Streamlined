@@ -1,16 +1,27 @@
 <h1>Rental Properties</h1>
 
-<ul>
+<ul style='list-style-type: none;'>
   <% sort_properties(@properties) do |property| %>
     <li>
       <a href='/properties/<%= property[:id] %>'>
         <h2><%= property[:address] %></h2>
       </a>
-      <% if property[:tenant] %>
-        <p>Rent left: <%= property[:rent] %> by tenant: <%= property[:tenant] %>
-      <% else property[:tenant] %>
-        <p>Rent amount: <%= property[:rent] %> <b style='text-decoration: underline;'>vancant</b></p>
-      <% end %>
+      <p>Rent amount: $<%= property[:rent] %> 
+        <% if property[:tenant] %>
+          by tenant: <%= property[:tenant] %>
+        <% else %>
+          <b style='text-decoration: underline;'>vancant</b>
+        <% end %>
+      </p>
     </li>
   <% end %>
-</ul>  
+</ul>
+
+<% if session[:username] %>
+  <p>Signed in as: <%= session[:username] %></p>
+  <form method='post' action='/users/signout'>
+    <button type='submit'>Sign Out</button>
+  </form>
+<% else %>
+  <a href='/users/signin'>Sign in</a>
+<% end %>
