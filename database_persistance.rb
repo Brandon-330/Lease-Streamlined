@@ -28,12 +28,24 @@ class Database
   def all_properties
     sql = <<~SQL
     SELECT p.name, a.house_number || ' ' || a.street AS address
-    FROM properties AS p
-    JOIN addresses AS a
+    FROM properties AS p JOIN addresses AS a
     ON a.id = p.address_id
     SQL
 
     result = query(sql)
+
+    format_sql_result_to_list_of_hashes(result)
+  end
+
+  def find_credentials(username, password)
+    sql = <<~SQL
+    SELECT c.id
+    FROM credentials AS c
+    WHERE username = $1
+    AND password = $2
+    SQL
+
+    result = query(sql, username, password)
 
     format_sql_result_to_list_of_hashes(result)
   end

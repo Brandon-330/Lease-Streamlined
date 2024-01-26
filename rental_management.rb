@@ -21,6 +21,12 @@ helpers do
   end
 end
 
+# WORK ON THIS SIGNIN
+def valid_signin?(username, password)
+  result = @storage.find_credentials(username, password)
+  result.size > 0
+end
+
 before do
   @storage = Database.new
 end
@@ -43,7 +49,7 @@ post '/users/signin' do
   username = params[:username]
   password = params[:password]
 
-  if username == 'admin' && password == 'secret'
+  if valid_signin?(username, password)
     session[:username] = username
     redirect '/'
   else

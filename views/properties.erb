@@ -4,9 +4,9 @@
   <% @properties.each do |property| %>
     <li>
       <a href='/properties/<%= property[:id] %>'>
-        <h2><%= property[:address] %></h2>
+        <h2><%= property[:name] %></h2>
       </a>
-      <p>Rent amount: $<%= property[:rent] %> 
+      <p>Address: <%= property[:address] %> 
         <% if property[:tenant] %>
           by tenant: <%= property[:tenant] %>
         <% else %>
