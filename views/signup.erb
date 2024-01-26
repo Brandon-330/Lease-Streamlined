@@ -1,15 +1,30 @@
 <!-- WORK ON THIS -->
 <form method='POST' action='/users/signup'>
-  <label for='name'>Name:
-    <input >
-  </label>
-  <label for='username'>Username:
+  <div>
+    <label for='name'>Name:
+      <input name='name' value='<%= params[:name] %>'/>
+    </label>
+  </div>
+  <div>
+    <label for='address'>Apartment Number:
+      < for='apartment_number' value='<%= params[:apartment_number] %>'/>
+    </label>
+  <div>
 
   <div>
-    <label for='username'> Username:
+    <label for='apartment_number'>Apartment Number:
+      <input for='apartment_number' value='<%= params[:apartment_number] %>'/>
+    </label>
+  </div>
+
+  <div></div>
+  
+  <div>
+    <label for='username'>Username:
       <input name='username' value='<%= params[:username] %>'/>
     </label>
   </div>
+  
   <div>
     <label for='password'> Password:
       <input type='password' name='password'/>
@@ -17,3 +32,4 @@
   </div>
 
   <button type='submit'>Sign up!</button>
+</form>
