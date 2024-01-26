@@ -1,5 +1,5 @@
 require 'sinatra'
-require 'sinatra/content_for'
+require 'sinatra/contrib'
 require 'bcrypt'
 
 require_relative 'database_persistance'
