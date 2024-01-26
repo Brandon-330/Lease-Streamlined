@@ -1,7 +1,7 @@
 <h1>Rental Properties</h1>
 
 <ul style='list-style-type: none;'>
-  <% sort_properties(@properties) do |property| %>
+  <% @properties.each do |property| %>
     <li>
       <a href='/properties/<%= property[:id] %>'>
         <h2><%= property[:address] %></h2>

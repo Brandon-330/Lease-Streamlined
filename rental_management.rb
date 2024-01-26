@@ -9,8 +9,9 @@ configure do
 end
 
 helpers do 
+  # WORK ON THIS HELPER METHOD
   def sort_properties(properties, &block)
-    sorted_properties_by_rent = properties.sort { |property_a, property_b| property_b[:rent] <=> property_a[:rent] }
+    sorted_properties_by_rent = properties.sort { |property| property[:name] }
 
     sorted_properties_by_rent.each(&block)
   end
