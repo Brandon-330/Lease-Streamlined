@@ -1,18 +1,16 @@
+<% content_for :title do %>
+  Properties
+<% end %>
+
 <h1>Rental Properties</h1>
 
 <ul style='list-style-type: none;'>
   <% @properties.each do |property| %>
     <li>
-      <a href='/properties/<%= property[:id] %>'>
+      <a style='display: inline-block' href='/properties/<%= property[:id] %>'>
         <h2><%= property[:name] %></h2>
+        <p>Address: <%= property[:address] %></p>
       </a>
-      <p>Address: <%= property[:address] %> 
-        <% if property[:tenant] %>
-          by tenant: <%= property[:tenant] %>
-        <% else %>
-          <b style='text-decoration: underline;'>vancant</b>
-        <% end %>
-      </p>
     </li>
   <% end %>
 </ul>

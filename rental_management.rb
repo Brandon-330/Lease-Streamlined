@@ -1,11 +1,18 @@
 require 'sinatra'
-require 'sinatra/reloader'
+require 'sinatra/content_for'
+require 'bcrypt'
 
 require_relative 'database_persistance'
-also_reload 'database_persistance.rb'
 
 configure do
   enable :sessions
+  set :session_secret, SecureRandom.hex(32)
+  set :erb, :escape_html => true #Escapes user input to prevent Javascript injection
+end
+
+configure(:development) do
+  require 'sinatra/reloader'
+  also_reload 'database_persistance.rb'
 end
 
 helpers do 
@@ -22,9 +29,15 @@ helpers do
 end
 
 # WORK ON THIS SIGNIN
-def valid_signin?(username, password)
+def error_for_signin?(username, password)
+  if username.empty? || password.empty?
+    return 'Please enter your username and password'
+  end
+
   result = @storage.find_credentials(username, password)
-  result.size > 0
+  if result.size == 0
+    return 'User not found'
+  end
 end
 
 before do
@@ -46,16 +59,17 @@ end
 
 # ENCRYPT PASSWORD
 post '/users/signin' do
-  username = params[:username]
-  password = params[:password]
+  username = params[:username].strip
+  password = params[:password].strip
 
-  if valid_signin?(username, password)
-    session[:username] = username
-    redirect '/'
-  else
-    session[:message] = 'Invalid credentials'
+  if error = error_for_signin?(username, password)
+    session[:message] = error
     status 422
     erb :signin
+  else
+    session[:username] = username
+    session[:message] = 'Successfully signed in!'
+    redirect '/'
   end
 end
 
@@ -70,4 +84,9 @@ get '/properties/:id' do
   id = params[:id]
   @property = load_property(id)
   erb :property
+end
+
+not_found do
+  session[:message] = 'That page was not found'
+  redirect '/'
 end
