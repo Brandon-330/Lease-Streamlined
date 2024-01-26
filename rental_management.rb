@@ -57,6 +57,10 @@ get '/users/signin' do
   erb :signin
 end
 
+get '/users/signup' do
+  erb :signup
+end
+
 # ENCRYPT PASSWORD
 post '/users/signin' do
   username = params[:username].strip
