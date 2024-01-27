@@ -6,6 +6,16 @@
   <a href='/buildings'>Previous Page</a>
 <% end %>
 
+<h1>Add New Building</h1>
+
 <form method='POST' action='/buildings/new'>
   <%= display_form_input('Building name:', 'name') %>
+  <p>Address information</p>
+  <%= display_form_input('Number:', 'number')%>
+  <%= display_form_input('Street:', 'street')%>
+  <%= display_form_input('City:', 'city')%>
+  
+  <%= display_form_input('State:', 'state')%>
+  <%= display_form_input('Zip code:', 'zip')%>
+  <button type='submit'>Add building</button>
 </form>
