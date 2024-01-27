@@ -1,0 +1,11 @@
+<% content_for :title do %>
+  Add new building
+<% end %>
+
+<% content_for :header_links do %>
+  <a href='/buildings'>Previous Page</a>
+<% end %>
+
+<form method='POST' action='/buildings/new'>
+  <%= display_form_input('Building name:', 'name') %>
+</form>

@@ -2,6 +2,10 @@
   <%= @building[:name] %>
 <% end %>
 
+<% content_for :header_links do %>
+  <a href='/buildings'>Previous Page</a>
+<% end %>
+
 <h1><%= @building[:name] %></h1>
 <p><%= @building[:address] %></p>
 

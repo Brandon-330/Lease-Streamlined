@@ -17,11 +17,22 @@ end
 
 helpers do 
   def load_building(id)
+    return nil if id.to_i.to_s != id
     @storage.find_building(id)
   end
 
   def load_apartments(building_id)
     @storage.find_apartments(building_id)
+  end
+
+  def display_form_input(label_text, for_attribute)
+    <<~FORM
+    <div>
+      <label for=#{for_attribute}>#{label_text}
+        <input name='#{for_attribute}' value='#{params[for_attribute.to_sym]}'></input>
+      </label>
+    </div>
+    FORM
   end
 end
 
@@ -37,6 +48,15 @@ def error_for_signin?(username, password)
   end
 end
 
+def redirect_homepage(message)
+  session[:message] = message
+  redirect '/'
+end
+
+def signed_in?
+  session[:username]
+end
+
 before do
   @storage = Database.new(logger)
 end
@@ -48,6 +68,28 @@ end
 get '/buildings' do
   @buildings = @storage.all_buildings
   erb :buildings
+end
+
+# WORK ON THESE
+get '/buildings/new' do
+  redirect_homepage('You must be signed in to view this page') unless signed_in?
+  erb :new_building
+end
+
+post '/buildings/new' do
+end
+
+# WORK ON THIS
+get '/buildings/:id' do
+  building_id = params[:id]
+  @building = load_building(building_id)
+  
+  if @building.nil?
+    redirect_homepage('Building was not found')
+  end
+
+  @apartments = load_apartments(building_id)
+  erb :building
 end
 
 get '/users/signin' do
@@ -65,12 +107,10 @@ post '/users/signin' do
 
   if error = error_for_signin?(username, password)
     session[:message] = error
-    status 422
     erb :signin
   else
     session[:username] = username
-    session[:message] = 'Successfully signed in!'
-    redirect '/'
+    redirect_homepage('Successfully signed in!')
   end
 end
 
@@ -80,15 +120,6 @@ post '/users/signout' do
   redirect '/'
 end
 
-# WORK ON THIS
-get '/buildings/:id' do
-  building_id = params[:id]
-  @building = load_building(building_id)
-  @apartments = load_apartments(building_id)
-  erb :building
-end
-
 not_found do
-  session[:message] = 'That page was not found'
-  redirect '/'
+  redirect_homepage('That page was not found')
 end

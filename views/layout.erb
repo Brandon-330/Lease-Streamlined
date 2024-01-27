@@ -6,6 +6,7 @@
   </head>
   <body>
     <p style='background-color:orange'><%= session.delete(:message) %></p>
+    <%= yield_content :header_links %>
     <%= yield %>
   </body>
 </html>
