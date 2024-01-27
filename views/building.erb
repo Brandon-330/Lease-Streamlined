@@ -1,0 +1,21 @@
+<% content_for :title do %>
+  <%= @building[:name] %>
+<% end %>
+
+<h1><%= @building[:name] %></h1>
+<p><%= @building[:address] %></p>
+
+<ul>
+  <% @apartments.each do |apartment| %>
+    <li>
+      Apartment number: <%= apartment[:apartment_number] %> Rent: <%= apartment[:rent] %> 
+      <% if apartment[:tenant_name] %>
+        Tenant: <%= apartment[:tenant_name] %>
+      <% else %>
+        <b>Vacant</b>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+
+<a href='/buildings/<%= @building[:id] %>/delete'>Delete building</a>

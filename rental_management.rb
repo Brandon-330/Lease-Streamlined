@@ -16,8 +16,12 @@ configure(:development) do
 end
 
 helpers do 
-  def load_property(id)
-    @storage.find_property(id)
+  def load_building(id)
+    @storage.find_building(id)
+  end
+
+  def load_apartments(building_id)
+    @storage.find_apartments(building_id)
   end
 end
 
@@ -38,12 +42,12 @@ before do
 end
 
 get '/' do
-  redirect '/properties'
+  redirect '/buildings'
 end
 
-get '/properties' do
-  @properties = @storage.all_properties
-  erb :properties
+get '/buildings' do
+  @buildings = @storage.all_buildings
+  erb :buildings
 end
 
 get '/users/signin' do
@@ -77,10 +81,11 @@ post '/users/signout' do
 end
 
 # WORK ON THIS
-get '/properties/:id' do
-  id = params[:id]
-  @property = load_property(id)
-  erb :property
+get '/buildings/:id' do
+  building_id = params[:id]
+  @building = load_building(building_id)
+  @apartments = load_apartments(building_id)
+  erb :building
 end
 
 not_found do

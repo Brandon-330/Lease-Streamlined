@@ -14,35 +14,35 @@ CREATE TABLE tenants (
   credential_id int REFERENCES credentials(id) ON DELETE CASCADE UNIQUE NOT NULL
 );
 
--- Establish a 1:1 relationship with properties. If property is deleted, so is its address
+-- Establish a 1:1 relationship with buildings. If building is deleted, so is its address
 CREATE TABLE addresses (
   id serial PRIMARY KEY,
-  house_number int NOT NULL, 
+  building_number int NOT NULL, 
   street text NOT NULL,
   city text NOT NULL,
   state char(2) NOT NULL,
   zip_code int NOT NULL
 );
 
--- Establish a 1:1 relationship with address. If address is deleted, so should the property
-CREATE TABLE properties (
+-- Establish a 1:1 relationship with address. If address is deleted, so should the building
+CREATE TABLE buildings (
   id serial PRIMARY KEY,
   name text NOT NULL,
   address_id int REFERENCES addresses(id) ON DELETE CASCADE UNIQUE NOT NULL
 );
 
--- Establish a 1:1 relationship with renters. If renter is deleted, property may stay
--- Establish a M:1 relationship with properties.If property is deleted, so should its apartments
+-- Establish a 1:1 relationship with renters. If renter is deleted, building may stay
+-- Establish a M:1 relationship with buildings.If building is deleted, so should its apartments
 CREATE TABLE apartments (
   id serial PRIMARY KEY,
   number int NOT NULL,
   rent NUMERIC(6, 2) NOT NULL,
-  property_id int REFERENCES properties(id) ON DELETE CASCADE NOT NULL,
+  building_id int REFERENCES buildings(id) ON DELETE CASCADE NOT NULL,
   tenant_id int REFERENCES tenants(id) UNIQUE
 );
 
--- Establish a 1:M relationship with apartments. There can be many payments linking to a single property
-  -- If apartment is deleted, so is the payments for the property
+-- Establish a 1:M relationship with apartments. There can be many payments linking to a single building
+  -- If apartment is deleted, so is the payments for the building
   -- Past renters should still have access to their payment history
 -- Establish a 1:1 relationship with renters, to identify the renter
 -- CREATE TABLE payments (

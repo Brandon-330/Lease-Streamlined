@@ -1,15 +1,15 @@
 <% content_for :title do %>
-  Properties
+  Buildings
 <% end %>
 
-<h1>Rental Properties</h1>
+<h1>Buildings</h1>
 
 <ul style='list-style-type: none;'>
-  <% @properties.each do |property| %>
+  <% @buildings.each do |building| %>
     <li>
-      <a style='display: inline-block' href='/properties/<%= property[:id] %>'>
-        <h2><%= property[:name] %></h2>
-        <p>Address: <%= property[:address] %></p>
+      <a style='display: inline-block' href='/buildings/<%= building[:id] %>'>
+        <h2><%= building[:name] %></h2>
+        <p>Address: <%= building[:address] %></p>
       </a>
     </li>
   <% end %>

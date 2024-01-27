@@ -8,17 +8,17 @@ INSERT INTO tenants (name, status, credential_id)
                     ('David', 'false', 3),
                     ('Jessica', DEFAULT, 2);
 
-INSERT INTO addresses (house_number, street, city, state, zip_code)
+INSERT INTO addresses (building_number, street, city, state, zip_code)
                VALUES (1774, 'Sedgewick Street', 'Wayne', 'PA', 14765),
                       (7941, 'Traveler Drive', 'Baltimore', 'MD', 19886),
                       (6479, 'Elmore Street', 'San Francisco', 'CA', 97612);
 
-INSERT INTO properties (name, address_id)
+INSERT INTO buildings (name, address_id)
                 VALUES ('Oakridge', 1),
                        ('4 Seasons', 2),
                        ('Dual Point', 3);
 
-INSERT INTO apartments (number, rent, property_id, tenant_id)
+INSERT INTO apartments (number, rent, building_id, tenant_id)
                 VALUES (203, 1500.00, 1, 1),
                        (102, 2200.00, 2, DEFAULT),
                        (505, 3999.99, 3, 3);             

@@ -2,19 +2,30 @@ require 'pg'
 
 class Database
   def initialize(logger)
-    @db = PG.connect(dbname: 'apartment_rental_management', user: 'postgres', password: 'postgres')
+    @db = PG.connect(dbname: 'apartments_rental_management', user: 'postgres', password: 'postgres')
     @logger = logger
   end
 
-  # NOT WORKING
-  def find_property(id)
+  def find_apartments(building_id)
     sql = <<~SQL
-    SELECT p.id, p.name, ad.house_number || ' ' || ad.street || ', ' || ad.city || ', ' || ad.state || ' ' || ad.zip_code AS address,
-    ap.rent
-    FROM properties AS p 
-    JOIN apartments AS ap ON ap.property_id = p.id
-    JOIN addresses AS ad ON ad.id = p.address_id
-    WHERE p.id = $1
+    SELECT a.number AS apartment_number, a.rent, t.name AS tenant_name
+    FROM apartments AS a
+    LEFT OUTER JOIN tenants AS t ON t.id = a.tenant_id
+    WHERE a.building_id = $1
+    ORDER BY a.rent DESC
+    SQL
+
+    result = query(sql, building_id)
+
+    format_sql_result_to_list_of_hashes(result)
+  end
+
+  def find_building(id)
+    sql = <<~SQL
+    SELECT b.id, b.name, a.building_number || ' ' || a.street || ', ' || a.city || ', ' || a.state || ' ' || a.zip_code AS address
+    FROM buildings AS b 
+    JOIN addresses AS a ON a.id = b.address_id
+    WHERE b.id = $1
     SQL
 
     result = query(sql, id)
@@ -22,12 +33,12 @@ class Database
     format_sql_result_to_list_of_hashes(result).first
   end
 
-  def all_properties
+  def all_buildings
     sql = <<~SQL
-    SELECT p.id, p.name, a.house_number || ' ' || a.street AS address
-    FROM properties AS p JOIN addresses AS a
-    ON a.id = p.address_id
-    ORDER BY p.name ASC
+    SELECT b.id, b.name, a.building_number || ' ' || a.street AS address
+    FROM buildings AS b
+    JOIN addresses AS a ON a.id = b.address_id
+    ORDER BY b.name ASC
     SQL
 
     result = query(sql)
