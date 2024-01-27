@@ -23,8 +23,8 @@ INSERT INTO apartments (number, rent, property_id, tenant_id)
                        (102, 2200.00, 2, DEFAULT),
                        (505, 3999.99, 3, 3);             
 
-INSERT INTO payments (amount, transaction_date, apartment_id, tenant_id)
-              VALUES (1000, 'Jan-20-2024', 1, 1),
-                     (500, 'Jan-20-2024', 1, 1),
-                     (3999.99, 'Jan-12-2024', 3, 3),
-                     (1000, 'Dec-10-2023', 2, 2);
+-- INSERT INTO payments (amount, transaction_date, apartment_id, tenant_id)
+--               VALUES (1000, 'Jan-20-2024', 1, 1),
+--                      (500, 'Jan-20-2024', 1, 1),
+--                      (3999.99, 'Jan-12-2024', 3, 3),
+--                      (1000, 'Dec-10-2023', 2, 2);

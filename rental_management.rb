@@ -16,13 +16,6 @@ configure(:development) do
 end
 
 helpers do 
-  # WORK ON THIS HELPER METHOD
-  def sort_properties(properties, &block)
-    sorted_properties_by_rent = properties.sort { |property| property[:name] }
-
-    sorted_properties_by_rent.each(&block)
-  end
-
   def load_property(id)
     @storage.find_property(id)
   end
@@ -41,7 +34,7 @@ def error_for_signin?(username, password)
 end
 
 before do
-  @storage = Database.new
+  @storage = Database.new(logger)
 end
 
 get '/' do

@@ -43,5 +43,8 @@ DEPENDENCIES
   sinatra-contrib
   webrick
 
+RUBY VERSION
+   ruby 3.2.2p53
+
 BUNDLED WITH
    2.5.5

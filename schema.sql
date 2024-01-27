@@ -6,6 +6,7 @@ CREATE TABLE credentials (
 );
 
 -- Determine name of renters and if they are active or past renters
+-- Establish a 1:1 relationship with credentials. If credentials is deleted, so should the tenant
 CREATE TABLE tenants (
   id serial PRIMARY KEY,
   name text NOT NULL,
@@ -31,12 +32,12 @@ CREATE TABLE properties (
 );
 
 -- Establish a 1:1 relationship with renters. If renter is deleted, property may stay
--- Establish a M:1 relationship with properties. If property is deleted, so should all apartments
+-- Establish a M:1 relationship with properties.If property is deleted, so should its apartments
 CREATE TABLE apartments (
   id serial PRIMARY KEY,
   number int NOT NULL,
   rent NUMERIC(6, 2) NOT NULL,
-  property_id int REFERENCES properties(id) NOT NULL,
+  property_id int REFERENCES properties(id) ON DELETE CASCADE NOT NULL,
   tenant_id int REFERENCES tenants(id) UNIQUE
 );
 
@@ -44,10 +45,10 @@ CREATE TABLE apartments (
   -- If apartment is deleted, so is the payments for the property
   -- Past renters should still have access to their payment history
 -- Establish a 1:1 relationship with renters, to identify the renter
-CREATE TABLE payments (
-  id serial PRIMARY KEY,
-  amount NUMERIC(6, 2) NOT NULL,
-  transaction_date date DEFAULT NOW() NOT NULL,
-  apartment_id int REFERENCES apartments(id) ON DELETE CASCADE NOT NULL,
-  tenant_id int REFERENCES tenants(id) NOT NULL
-);
+-- CREATE TABLE payments (
+--   id serial PRIMARY KEY,
+--   amount NUMERIC(6, 2) NOT NULL,
+--   transaction_date date DEFAULT NOW() NOT NULL,
+--   apartment_id int REFERENCES apartments(id) ON DELETE CASCADE NOT NULL,
+--   tenant_id int REFERENCES tenants(id) NOT NULL
+-- );

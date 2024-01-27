@@ -6,3 +6,5 @@ gem 'sinatra-contrib' #To add content_for and reloader capabilities
 gem 'webrick'
 gem 'pg' #PostgreSQL (database)
 gem 'bcrypt' #Encrypt passwords
+
+ruby '3.2.2'
