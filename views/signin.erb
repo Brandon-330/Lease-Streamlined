@@ -1,5 +1,5 @@
 <form method='post' action='/users/signin'>
-  <%= display_form_input('Username:', 'username') %>
+  <%= display_form_input('Username:', 'username', params[:username]) %>
   <div>
     <label for='password'> Password:
       <input type='password' name='password'/>

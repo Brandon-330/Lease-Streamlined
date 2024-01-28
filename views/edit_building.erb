@@ -1,3 +1,14 @@
-<%%>
+<% content_for :title do %>
+  Edit <%= @building[:name] %>
+<% end %>
 
-<% %>
+<% content_for :header_links do %>
+  <a href='/buildings/<%= @building[:id] %>'>Previous Page</a>
+<% end %>
+
+<h1>Editing <%= @building[:name] %></h1>
+
+<form method='POST' action='/buildings/<%= @building[:id] %>/edit'>
+</form>
+
+<a href='/buildings/<%= @building[:id] %>/delete'>Delete</a>

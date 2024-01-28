@@ -25,18 +25,17 @@ helpers do
     @storage.find_apartments(building_id)
   end
 
-  def display_form_input(label_text, for_attribute)
+  def display_form_input(label_text, for_attribute, value_attribute='')
     <<~FORM
     <div>
       <label for=#{for_attribute}>#{label_text}
-        <input name='#{for_attribute}' value='#{params[for_attribute.to_sym]}'></input>
+        <input name='#{for_attribute}' value='#{value_attribute}'></input>
       </label>
     </div>
     FORM
   end
 end
 
-# WORK ON THIS SIGNIN
 def error_for_signin?(username, password)
   if username.empty? || password.empty?
     return 'Please enter your username and password'
@@ -47,6 +46,10 @@ def error_for_signin?(username, password)
     return 'User not found'
   end
 end
+
+def error_new_building(name, *address)
+
+end 
 
 def redirect_homepage(message)
   session[:message] = message
@@ -73,13 +76,26 @@ end
 # WORK ON THESE
 get '/buildings/new' do
   redirect_homepage('You must be signed in to view this page') unless signed_in?
+  @states_abbreviated = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
+  
   erb :new_building
 end
 
+# WORK ON THIS
 post '/buildings/new' do
+  building_name = params[:name].strip
+  number = params[:number].strip
+  street = params[:street].strip
+  city = params[:city].strip
+  state = params[:state].strip
+  zip = params[:zip].strip
+
+  if error = error_new_building(building_name, number, street, city, state, zip)
+  else
+    redirect_homepage("#{building_name} successfully added")
+  end
 end
 
-# WORK ON THIS
 get '/buildings/:id' do
   building_id = params[:id]
   @building = load_building(building_id)
@@ -90,6 +106,17 @@ get '/buildings/:id' do
 
   @apartments = load_apartments(building_id)
   erb :building
+end
+
+get '/buildings/:id/edit' do
+  building_id = params[:id]
+  @building = load_building(building_id)
+
+  if @building.nil?
+    redirect_homepage('Building was not found')
+  end
+
+  erb :edit_building
 end
 
 get '/users/signin' do

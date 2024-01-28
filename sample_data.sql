@@ -21,7 +21,9 @@ INSERT INTO buildings (name, address_id)
 INSERT INTO apartments (number, rent, building_id, tenant_id)
                 VALUES (203, 1500.00, 1, 1),
                        (102, 2200.00, 2, DEFAULT),
-                       (505, 3999.99, 3, 3);             
+                       (505, 3999.99, 3, 3),
+                       (205, 2500.00, 2, DEFAULT),
+                       (301, 2600.00, 2, DEFAULT);             
 
 -- INSERT INTO payments (amount, transaction_date, apartment_id, tenant_id)
 --               VALUES (1000, 'Jan-20-2024', 1, 1),

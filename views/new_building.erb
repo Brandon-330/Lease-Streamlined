@@ -9,13 +9,20 @@
 <h1>Add New Building</h1>
 
 <form method='POST' action='/buildings/new'>
-  <%= display_form_input('Building name:', 'name') %>
+  <%= display_form_input('Building name:', 'name', params[:name]) %>
   <p>Address information</p>
-  <%= display_form_input('Number:', 'number')%>
-  <%= display_form_input('Street:', 'street')%>
-  <%= display_form_input('City:', 'city')%>
-  
-  <%= display_form_input('State:', 'state')%>
-  <%= display_form_input('Zip code:', 'zip')%>
+  <%= display_form_input('Number:', 'number', params[:number])%>
+  <%= display_form_input('Street:', 'street', params[:street])%>
+  <%= display_form_input('City:', 'city', params[:city])%>
+  <div>
+    <label for='state'>State:
+      <select name='state'>
+        <% @states_abbreviated.each do |state| %>
+          <option value='<%= state %>'><%= state %></option>
+        <% end %>
+      </select>
+    </label>
+  </div>
+  <%= display_form_input('Zip code:', 'zip', params[:zip])%>
   <button type='submit'>Add building</button>
 </form>
