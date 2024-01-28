@@ -11,11 +11,14 @@
 <form method='POST' action='/buildings/<%= @building[:id] %>/edit'>
   <p><b>Building information</b></p>
   <%= display_form_input('Building name:', 'building_name', params[:building_name] || @building[:name] ) %>
+  
   <p><b>Address information</b></p>
   <%= display_form_input('Number:', 'building_number', params[:building_number] || @building[:building_number]) %>
   <%= display_form_input('Street:', 'street', params[:street] || @building[:street]) %>
   <%= display_form_input('City:', 'city', params[:city] || @building[:city]) %>
   <%= display_form_input('Zip code:', 'zip_code', params[:zip_code] || @building[:zip_code]) %>
+
+  <button type='submit'>Edit building</button>
 </form>
 
 <a href='/buildings/<%= @building[:id] %>/delete'>Delete building</a>
