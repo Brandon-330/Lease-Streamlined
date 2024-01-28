@@ -17,7 +17,7 @@
   <div>
     <label for='state'>State:
       <select name='state'>
-        <% @states_abbreviated.each do |state| %>
+        <% load_abbreviated_states.each do |state| %>
           <option value='<%= state %>'><%= state %></option>
         <% end %>
       </select>

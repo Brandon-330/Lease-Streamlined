@@ -16,6 +16,19 @@
   <%= display_form_input('Number:', 'building_number', params[:building_number] || @building[:building_number]) %>
   <%= display_form_input('Street:', 'street', params[:street] || @building[:street]) %>
   <%= display_form_input('City:', 'city', params[:city] || @building[:city]) %>
+  <div>
+    <label for='state'>State:
+      <select name='state'>
+        <% load_abbreviated_states.each do |state| %>
+          <% if state == (params[:state] || @building[:state]) %>
+            <option value='<%= params[:state] || @building[:state] %>' selected><%= params[:state] || @building[:state] %></option>
+          <% else %>
+            <option value='<%= state %>'><%= state %></option>
+          <% end %>
+        <% end %>
+      </select>
+    </label>
+  </div>
   <%= display_form_input('Zip code:', 'zip_code', params[:zip_code] || @building[:zip_code]) %>
 
   <button type='submit'>Edit building</button>

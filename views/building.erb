@@ -12,7 +12,7 @@
 <ul>
   <% @apartments.each do |apartment| %>
     <li>
-      Apartment number: <%= apartment[:apartment_number] %> Rent: <%= apartment[:rent] %> 
+      Apartment number: <%= apartment[:apartment_number] %> Rent: $<%= apartment[:rent] %> 
       <% if apartment[:tenant_name] %>
         Tenant: <%= apartment[:tenant_name] %>
       <% else %>
@@ -22,4 +22,10 @@
   <% end %>
 </ul>
 
-<a href='/buildings/<%= @building[:id] %>/edit'>Edit building</a>
+<div>
+  <a href='/buildings/<%= @building[:id] %>/apartments/new'>Add apartment</a>
+</div>
+
+<div>
+  <a href='/buildings/<%= @building[:id] %>/edit'>Edit building</a>
+</div>

@@ -33,6 +33,20 @@ class Database
     format_sql_result_to_list_of_hashes(result).first
   end
 
+  def update_building_name(id, name)
+    sql = <<~SQL
+    UPDATE buildings
+    SET name = $2
+    WHERE id = $1
+    SQL
+
+    query(sql, id, name)
+  end
+
+  def update_building_address(building_id, *address)
+    
+  end
+
   def all_buildings
     sql = <<~SQL
     SELECT b.id, b.name, a.building_number || ' ' || a.street AS address

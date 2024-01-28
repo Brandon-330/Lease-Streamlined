@@ -85,7 +85,6 @@ end
 # WORK ON THESE
 get '/buildings/new' do
   redirect_homepage('You must be signed in to view this page') unless signed_in?
-  @states_abbreviated = load_abbreviated_states
   
   erb :new_building
 end
@@ -129,7 +128,24 @@ get '/buildings/:id/edit' do
 end
 
 post '/buildings/:id/edit' do
+  building_id = params[:id]
+  @building = load_building(building_id)
 
+  if @building.nil?
+    redirect_homepage('Building was not found')
+  end
+
+  building_name = params[:building_name].strip
+  number = params[:building_number].strip
+  street = params[:street].strip
+  city = params[:city].strip
+  state = params[:state].strip
+  zip = params[:zip_code].strip
+
+  @storage.update_building_name(building_id, building_name)
+  
+  redirect_homepage('Building was successsfully updated')
+  erb :edit_building
 end
 
 get '/users/signin' do
