@@ -15,13 +15,24 @@
   <% end %>
 </ul>
 
-<a href='/buildings/new'>Add building</a>
+<div>
+  <% if @page > 1 %>
+    <a href='/buildings/new'>Previous page</a>
+  <% end %>
+  <a href='?page=<%= @page %>'>Next page</a>
+</div>
 
-<% if session[:username] %>
-  <p>Signed in as: <%= session[:username] %></p>
-  <form method='post' action='/users/signout'>
-    <button type='submit'>Sign Out</button>
-  </form>
-<% else %>
-  <a href='/users/signin'>Sign in</a>
-<% end %>
+<div>
+  <a href='/buildings/new'>Add building</a>
+</div>
+
+<div>
+  <% if session[:username] %>
+    <p>Signed in as: <%= session[:username] %></p>
+    <form method='post' action='/users/signout'>
+      <button type='submit'>Sign Out</button>
+    </form>
+  <% else %>
+    <a href='/users/signin'>Sign in</a>
+  <% end %>
+</div>

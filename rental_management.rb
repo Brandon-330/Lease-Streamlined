@@ -78,6 +78,7 @@ get '/' do
 end
 
 get '/buildings' do
+  @page = params[:page] || 1
   @buildings = @storage.all_buildings
   erb :buildings
 end
