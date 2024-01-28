@@ -22,7 +22,7 @@ class Database
 
   def find_building(id)
     sql = <<~SQL
-    SELECT b.id, b.name, a.building_number || ' ' || a.street || ', ' || a.city || ', ' || a.state || ' ' || a.zip_code AS address
+    SELECT b.id, b.name, a.building_number, a.street, a.city, a.state, a.zip_code
     FROM buildings AS b 
     JOIN addresses AS a ON a.id = b.address_id
     WHERE b.id = $1

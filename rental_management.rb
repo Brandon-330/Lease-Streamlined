@@ -16,6 +16,15 @@ configure(:development) do
 end
 
 helpers do 
+  def load_abbreviated_states
+    ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
+  end
+
+  def format_address(building_hash)
+    hsh = building_hash
+    "#{hsh[:building_number]} #{hsh[:street]}, #{hsh[:city]}, #{hsh[:state]} #{hsh[:zip_code]}"
+  end
+
   def load_building(id)
     return nil if id.to_i.to_s != id
     @storage.find_building(id)
@@ -76,7 +85,7 @@ end
 # WORK ON THESE
 get '/buildings/new' do
   redirect_homepage('You must be signed in to view this page') unless signed_in?
-  @states_abbreviated = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
+  @states_abbreviated = load_abbreviated_states
   
   erb :new_building
 end
@@ -117,6 +126,10 @@ get '/buildings/:id/edit' do
   end
 
   erb :edit_building
+end
+
+post '/buildings/:id/edit' do
+
 end
 
 get '/users/signin' do
