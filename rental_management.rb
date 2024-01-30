@@ -17,14 +17,10 @@ end
 
 helpers do 
   CONTENT_PER_PAGE = 5
-
+  STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
   def paginate(content_array, page_number)
     content_idx = (page_number - 1) * CONTENT_PER_PAGE
     content_array[content_idx, CONTENT_PER_PAGE]
-  end
-
-  def load_abbreviated_states
-    ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
   end
 
   def format_address(building_hash)
@@ -61,7 +57,7 @@ def last_page(content_array)
   page_number
 end
 
-def invalid_page(content_array, page)
+def error_for_page(content_array, page)
   'Page does not exist' if page <= 0 || page > last_page(content_array)
 end
 
@@ -100,7 +96,8 @@ end
 get '/buildings' do
   @page = (params[:page] || 1).to_i
   @buildings = @storage.all_buildings
-  if error = invalid_page(@buildings, @page)
+
+  if error = error_for_page(@buildings, @page)
     session[:message] = error
     redirect '/buildings'
   elsif !signed_in?

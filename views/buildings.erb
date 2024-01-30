@@ -17,10 +17,10 @@
 
 <div>
   <% if @page > 1 %>
-    <a href='/buildings/?page=<%= @page - 1 %>'>Previous page</a>
+    <a href='?page=<%= @page - 1 %>'>Previous page</a>
   <% end %>
   
-  <ins><%= @page %></ins>
+  <ins>Page <%= @page %> of <%= last_page(@buildings) %></ins>
 
   <% if @page < last_page(@buildings) %>
     <a href='?page=<%= @page + 1 %>'>Next page</a>
