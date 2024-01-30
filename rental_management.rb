@@ -16,6 +16,13 @@ configure(:development) do
 end
 
 helpers do 
+  CONTENT_PER_PAGE = 5
+
+  def paginate(content_array, page_number)
+    content_idx = (page_number - 1) * CONTENT_PER_PAGE
+    content_array[content_idx, CONTENT_PER_PAGE]
+  end
+
   def load_abbreviated_states
     ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
   end
@@ -43,6 +50,19 @@ helpers do
     </div>
     FORM
   end
+end
+
+def last_page(content_array)
+  page_number = 1
+  while page_number * CONTENT_PER_PAGE < content_array.size
+    page_number += 1
+  end
+
+  page_number
+end
+
+def invalid_page(content_array, page)
+  'Page does not exist' if page <= 0 || page > last_page(content_array)
 end
 
 def error_for_signin?(username, password)
@@ -78,9 +98,17 @@ get '/' do
 end
 
 get '/buildings' do
-  @page = params[:page] || 1
+  @page = (params[:page] || 1).to_i
   @buildings = @storage.all_buildings
-  erb :buildings
+  if error = invalid_page(@buildings, @page)
+    session[:message] = error
+    redirect '/buildings'
+  elsif !signed_in?
+    session[:message] = 'User must be signed in to view this page'
+    redirect '/users/signin'
+  else
+    erb :buildings
+  end
 end
 
 # WORK ON THESE

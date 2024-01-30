@@ -5,7 +5,7 @@
 <h1>Buildings</h1>
 
 <ul style='list-style-type: none;'>
-  <% @buildings.each do |building| %>
+  <% paginate(@buildings, @page).each do |building| %>
     <li>
       <a style='display: inline-block' href='/buildings/<%= building[:id] %>'>
         <h2><%= building[:name] %></h2>
@@ -17,9 +17,14 @@
 
 <div>
   <% if @page > 1 %>
-    <a href='/buildings/new'>Previous page</a>
+    <a href='/buildings/?page=<%= @page - 1 %>'>Previous page</a>
   <% end %>
-  <a href='?page=<%= @page %>'>Next page</a>
+  
+  <ins><%= @page %></ins>
+
+  <% if @page < last_page(@buildings) %>
+    <a href='?page=<%= @page + 1 %>'>Next page</a>
+  <% end %>
 </div>
 
 <div>
