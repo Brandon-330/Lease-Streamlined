@@ -19,7 +19,7 @@
   <% if @page > 1 %>
     <a href='?page=<%= @page - 1 %>'>Previous page</a>
   <% end %>
-  
+
   <ins>Page <%= @page %> of <%= last_page(@buildings) %></ins>
 
   <% if @page < last_page(@buildings) %>

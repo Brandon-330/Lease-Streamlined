@@ -3,6 +3,7 @@ GEM
   specs:
     base64 (0.2.0)
     bcrypt (3.1.20)
+    erubis (2.7.0)
     multi_json (1.15.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
@@ -37,6 +38,7 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt
+  erubis
   pg
   rackup
   sinatra

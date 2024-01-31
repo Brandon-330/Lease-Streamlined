@@ -7,10 +7,10 @@
 <% end %>
 
 <h1><%= @building[:name] %></h1>
-<p><%= format_address(@building) %></p>
+<p><%== format_address(@building) %></p>
 
 <ul>
-  <% @apartments.each do |apartment| %>
+  <% paginate(@apartments, @page).each do |apartment| %>
     <li>
       Apartment number: <%= apartment[:apartment_number] %> Rent: $<%= apartment[:rent] %> 
       <% if apartment[:tenant_name] %>
@@ -21,6 +21,18 @@
     </li>
   <% end %>
 </ul>
+
+<div>
+  <% if @page > 1 %>
+    <a href='?page=<%= @page - 1 %>'>Previous page</a>
+  <% end %>
+
+  <ins>Page <%= @page %> of <%= last_page(@apartments) %></ins>
+
+  <% if @page < last_page(@apartments) %>
+    <a href='?page=<%= @page + 1 %>'>Next page</a>
+  <% end %>
+</div>
 
 <div>
   <a href='/buildings/<%= @building[:id] %>/apartments/new'>Add apartment</a>

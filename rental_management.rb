@@ -1,13 +1,14 @@
 require 'sinatra'
-require 'sinatra/contrib'
-require 'bcrypt'
+require 'sinatra/contrib' # To implement Sinatra reloader
+require 'erubis' # To escape HTML for user input
+require 'bcrypt' # Encrypt passwords
 
 require_relative 'database_persistance'
 
 configure do
   enable :sessions
-  set :session_secret, SecureRandom.hex(32)
-  set :erb, :escape_html => true #Escapes user input to prevent Javascript injection
+  set :session_secret, SecureRandom.hex(32) # Secures session
+  set :erb, :escape_html => true # Escapes user input to prevent Javascript injection
 end
 
 configure(:development) do
@@ -16,8 +17,9 @@ configure(:development) do
 end
 
 helpers do 
-  CONTENT_PER_PAGE = 5
+  CONTENT_PER_PAGE = 2
   STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
+  # Create pagination for an array
   def paginate(content_array, page_number)
     content_idx = (page_number - 1) * CONTENT_PER_PAGE
     content_array[content_idx, CONTENT_PER_PAGE]
@@ -37,6 +39,7 @@ helpers do
     @storage.find_apartments(building_id)
   end
 
+  # WORK ON THIS. POSSIBLE ESCAPE ISSUE
   def display_form_input(label_text, for_attribute, value_attribute='')
     <<~FORM
     <div>
@@ -48,6 +51,7 @@ helpers do
   end
 end
 
+# Last page to be used during pagination
 def last_page(content_array)
   page_number = 1
   while page_number * CONTENT_PER_PAGE < content_array.size
@@ -73,13 +77,7 @@ def error_for_signin?(username, password)
 end
 
 def error_new_building(name, *address)
-
 end 
-
-def redirect_homepage(message)
-  session[:message] = message
-  redirect '/'
-end
 
 def signed_in?
   session[:username]
@@ -110,9 +108,12 @@ end
 
 # WORK ON THESE
 get '/buildings/new' do
-  redirect_homepage('You must be signed in to view this page') unless signed_in?
-  
-  erb :new_building
+  if !signed_in?
+    session[:message] = 'You must be signed in to view this page'
+    redirect '/users/signin'
+  else
+    erb :new_building
+  end
 end
 
 # WORK ON THIS
@@ -126,20 +127,29 @@ post '/buildings/new' do
 
   if error = error_new_building(building_name, number, street, city, state, zip)
   else
-    redirect_homepage("#{building_name} successfully added")
+    session[:message] = "#{building_name} successfully added"
+    redirect '/buildings'
   end
 end
 
 get '/buildings/:id' do
   building_id = params[:id]
   @building = load_building(building_id)
+  @page = (params[:page] || 1).to_i
   
   if @building.nil?
-    redirect_homepage('Building was not found')
+    session[:message] = 'Building was not found'
+    redirect '/buildings'
   end
 
   @apartments = load_apartments(building_id)
-  erb :building
+
+  if error = error_for_page(@apartments, @page)
+    session[:message] = error
+    redirect "/buildings/#{@building[:id]}"
+  else
+    erb :building
+  end
 end
 
 get '/buildings/:id/edit' do
@@ -147,12 +157,14 @@ get '/buildings/:id/edit' do
   @building = load_building(building_id)
 
   if @building.nil?
-    redirect_homepage('Building was not found')
+    session[:message] = 'Building was not found'
+    redirect '/buildings'
+  else
+    erb :edit_building
   end
-
-  erb :edit_building
 end
 
+# WORK ON THIS
 post '/buildings/:id/edit' do
   building_id = params[:id]
   @building = load_building(building_id)
@@ -170,7 +182,7 @@ post '/buildings/:id/edit' do
 
   @storage.update_building_name(building_id, building_name)
   
-  redirect_homepage('Building was successsfully updated')
+  session[:message] = 'Building was successfully updated'
   erb :edit_building
 end
 
@@ -192,16 +204,18 @@ post '/users/signin' do
     erb :signin
   else
     session[:username] = username
-    redirect_homepage('Successfully signed in!')
+    session[:message] = 'Successfully signed in'
+    redirect '/buildings'
   end
 end
 
 post '/users/signout' do
   session.delete(:username)
 
-  redirect '/'
+  redirect '/buildings'
 end
 
 not_found do
-  redirect_homepage('That page was not found')
+  session[:message] = 'That page was not found'
+  redirect '/buildings'
 end
