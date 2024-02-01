@@ -7,7 +7,6 @@
 <% end %>
 
 <h1><%= @building[:name] %></h1>
-<p><%== format_address(@building) %></p>
 
 <ul>
   <% paginate(@apartments, @page).each do |apartment| %>

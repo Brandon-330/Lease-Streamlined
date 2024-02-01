@@ -17,17 +17,11 @@ configure(:development) do
 end
 
 helpers do 
-  CONTENT_PER_PAGE = 2
-  STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']
+  CONTENT_PER_PAGE = 5
   # Create pagination for an array
   def paginate(content_array, page_number)
     content_idx = (page_number - 1) * CONTENT_PER_PAGE
     content_array[content_idx, CONTENT_PER_PAGE]
-  end
-
-  def format_address(building_hash)
-    hsh = building_hash
-    "#{hsh[:building_number]} #{hsh[:street]}, #{hsh[:city]}, #{hsh[:state]} #{hsh[:zip_code]}"
   end
 
   def load_building(id)
@@ -37,17 +31,6 @@ helpers do
 
   def load_apartments(building_id)
     @storage.find_apartments(building_id)
-  end
-
-  # WORK ON THIS. POSSIBLE ESCAPE ISSUE
-  def display_form_input(label_text, for_attribute, value_attribute='')
-    <<~FORM
-    <div>
-      <label for=#{for_attribute}>#{label_text}
-        <input name='#{for_attribute}' value='#{value_attribute}'></input>
-      </label>
-    </div>
-    FORM
   end
 end
 
@@ -76,7 +59,10 @@ def error_for_signin?(username, password)
   end
 end
 
-def error_new_building(name, *address)
+def error_new_building(name)
+  if name.nil?
+    'Please enter the building name'
+  end
 end 
 
 def signed_in?
@@ -98,9 +84,6 @@ get '/buildings' do
   if error = error_for_page(@buildings, @page)
     session[:message] = error
     redirect '/buildings'
-  elsif !signed_in?
-    session[:message] = 'User must be signed in to view this page'
-    redirect '/users/signin'
   else
     erb :buildings
   end
@@ -119,14 +102,12 @@ end
 # WORK ON THIS
 post '/buildings/new' do
   building_name = params[:name].strip
-  number = params[:number].strip
-  street = params[:street].strip
-  city = params[:city].strip
-  state = params[:state].strip
-  zip = params[:zip].strip
 
-  if error = error_new_building(building_name, number, street, city, state, zip)
+  if error = error_new_building(building_name)
+    session[:message] = error
+    erb :new_building
   else
+    @storage.add_building(building_name)
     session[:message] = "#{building_name} successfully added"
     redirect '/buildings'
   end
@@ -153,6 +134,11 @@ get '/buildings/:id' do
 end
 
 get '/buildings/:id/edit' do
+  if !signed_in?
+    session[:message] = 'You must be signed in to view this page'
+    redirect '/users/signin'
+  end
+
   building_id = params[:id]
   @building = load_building(building_id)
 
@@ -174,16 +160,27 @@ post '/buildings/:id/edit' do
   end
 
   building_name = params[:building_name].strip
-  number = params[:building_number].strip
-  street = params[:street].strip
-  city = params[:city].strip
-  state = params[:state].strip
-  zip = params[:zip_code].strip
 
-  @storage.update_building_name(building_id, building_name)
-  
+  @storage.update_building(building_id, building_name)
   session[:message] = 'Building was successfully updated'
-  erb :edit_building
+  redirect "/buildings/#{@building[:id]}"
+end
+
+post '/buildings/:id/delete' do
+  building_id = params[:id]
+  @building = load_building(building_id)
+
+  if @building.nil?
+    redirect_homepage('Building was not found')
+  end
+
+  @storage.delete_building(@building[:id])
+  session[:message] = 'Building was successfully deleted'
+  redirect '/buildings'
+end
+
+get '/buildings/:building_id/apartments/new' do
+  
 end
 
 get '/users/signin' do

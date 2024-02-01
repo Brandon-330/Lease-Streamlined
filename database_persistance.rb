@@ -3,7 +3,7 @@ require 'pg'
 class Database
   def initialize(logger)
     @db = PG.connect(dbname: 'apartments_rental_management', user: 'postgres', password: 'postgres')
-    @logger = logger
+    @logger = logger # Logger for developing purposes
   end
 
   def find_apartments(building_id)
@@ -20,12 +20,23 @@ class Database
     format_sql_result_to_list_of_hashes(result)
   end
 
+  def all_buildings
+    sql = <<~SQL
+    SELECT id, name
+    FROM buildings
+    ORDER BY name ASC
+    SQL
+
+    result = query(sql)
+
+    format_sql_result_to_list_of_hashes(result)
+  end
+
   def find_building(id)
     sql = <<~SQL
-    SELECT b.id, b.name, a.building_number, a.street, a.city, a.state, a.zip_code
-    FROM buildings AS b 
-    JOIN addresses AS a ON a.id = b.address_id
-    WHERE b.id = $1
+    SELECT id, name
+    FROM buildings 
+    WHERE id = $1
     SQL
 
     result = query(sql, id)
@@ -33,7 +44,16 @@ class Database
     format_sql_result_to_list_of_hashes(result).first
   end
 
-  def update_building_name(id, name)
+  def add_building(building_name)
+    sql = <<~SQL
+    INSERT INTO buildings (name)
+                   VALUES ($1)
+    SQL
+
+    query(sql, building_name)
+  end
+
+  def update_building(id, name)
     sql = <<~SQL
     UPDATE buildings
     SET name = $2
@@ -43,27 +63,19 @@ class Database
     query(sql, id, name)
   end
 
-  def update_building_address(building_id, *address)
-    
-  end
-
-  def all_buildings
+  def delete_building(id)
     sql = <<~SQL
-    SELECT b.id, b.name, a.building_number || ' ' || a.street AS address
-    FROM buildings AS b
-    JOIN addresses AS a ON a.id = b.address_id
-    ORDER BY b.name ASC
+    DELETE FROM buildings
+    WHERE id = $1
     SQL
 
-    result = query(sql)
-
-    format_sql_result_to_list_of_hashes(result)
+    query(sql, id)
   end
 
   def find_credentials(username, password)
     sql = <<~SQL
-    SELECT c.id
-    FROM credentials AS c
+    SELECT id
+    FROM credentials
     WHERE username = $1
     AND password = $2
     SQL
