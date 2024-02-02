@@ -18,7 +18,7 @@ end
 
 helpers do 
   CONTENT_PER_PAGE = 5
-  # Create pagination for an array
+  # Create pagination for an array of content
   def paginate(content_array, page_number)
     content_idx = (page_number - 1) * CONTENT_PER_PAGE
     content_array[content_idx, CONTENT_PER_PAGE]
@@ -80,6 +80,8 @@ end
 def error_new_building(name)
   if name.nil?
     'Please enter the building name'
+  elsif @storage.all_buildings.any? { |building| building[:name] == name }
+    'Please enter a unique building name'
   end
 end
 
@@ -88,6 +90,8 @@ def error_new_apartment(apartment_number, rent, tenant=nil)
     error
   elsif error = error_rent(rent)
     error
+  elsif @storage.all_tenants.any? { |tenants_hsh| tenants_hsh[:name] == tenant }
+    'Tenant is already occupying another appartment'
   end
 end
 
@@ -101,15 +105,16 @@ end
 
 def error_rent(rent_str)
   return 'Enter an input for rent' if rent_str == ''
-  return 'Rent must include a period' unless rent_str.include?('.')
 
+  rent_str += '.00' if !rent_str.include?('.')
   rent_arr = rent_str.split('.')
   
   if rent_arr.size != 2
     'Rent must include dollars, a period, and cents'
   elsif rent_arr.any? { |str| str.nil? }
     'Rent must include cents'
-  elsif rent_arr.any? { |str| !is_integer?(str) }
+  # CONTINUE HERE
+  elsif rent_arr.any? { |str| !is_integer?(str.gsub(/^0+/, '')) } # Remove leading zeroes
     'Please enter valid integers for dollars and cents'
   elsif rent_arr[0].to_i <= 0 || rent_arr[0].to_i > 10000
     'Please enter a rent amount greater than $0 and less than $10,000'
@@ -137,7 +142,6 @@ get '/buildings' do
   erb :buildings
 end
 
-# WORK ON THESE
 get '/buildings/new' do
   if !signed_in?
     session[:message] = 'You must be signed in to view this page'

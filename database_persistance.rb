@@ -72,6 +72,19 @@ class Database
     query(sql, id)
   end
 
+  # Possible error here
+  def all_tenants
+    sql = <<~SQL
+    SELECT name
+    FROM tenants
+    JOIN apartments ON apartments.tenant_id = tenants.id
+    SQL
+
+    result = query(sql, id)
+    
+    format_sql_result_to_list_of_hashes(result)
+  end
+
   def find_credentials(username, password)
     sql = <<~SQL
     SELECT id
