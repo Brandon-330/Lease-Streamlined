@@ -6,7 +6,7 @@ class Database
     @logger = logger # Logger for developing purposes
   end
 
-  def find_apartments(building_id)
+  def find_apartment(building_id)
     sql = <<~SQL
     SELECT a.number AS apartment_number, a.rent, t.name AS tenant_name
     FROM apartments AS a

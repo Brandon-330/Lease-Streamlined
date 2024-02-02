@@ -25,12 +25,30 @@ helpers do
   end
 
   def load_building(id)
-    return nil if id.to_i.to_s != id
-    @storage.find_building(id)
+    unless is_integer?(id)
+      session[:message] = 'Building was not found'
+      redirect '/buildings'
+    end
+
+    building = @storage.find_building(id)
+    return building if building
+
+    session[:message] = 'Building was not found'
+    redirect '/buildings'
   end
 
   def load_apartments(building_id)
-    @storage.find_apartments(building_id)
+    @storage.find_apartment(building_id)
+  end
+
+  def load_page(content_array, page_param)
+    page = (page_param || 1).to_i
+    if page <= 0 || page > last_page(content_array)
+      session[:message] = 'Page does not exist'
+      redirect '/buildings'
+    else
+      page
+    end
   end
 end
 
@@ -44,11 +62,11 @@ def last_page(content_array)
   page_number
 end
 
-def error_for_page(content_array, page)
-  'Page does not exist' if page <= 0 || page > last_page(content_array)
+def is_integer?(string)
+  string.to_i.to_s == string
 end
 
-def error_for_signin?(username, password)
+def error_signin?(username, password)
   if username.empty? || password.empty?
     return 'Please enter your username and password'
   end
@@ -63,7 +81,42 @@ def error_new_building(name)
   if name.nil?
     'Please enter the building name'
   end
-end 
+end
+
+def error_new_apartment(apartment_number, rent, tenant=nil)
+  if error = error_apartment_number(apartment_number)
+    error
+  elsif error = error_rent(rent)
+    error
+  end
+end
+
+def error_apartment_number(number_str)
+  if !is_integer?(number_str)
+    'Apartment number must be all integers'
+  elsif number_str.length != 3
+    'Apartment number must be three digits in length'
+  end
+end
+
+def error_rent(rent_str)
+  return 'Enter an input for rent' if rent_str == ''
+  return 'Rent must include a period' unless rent_str.include?('.')
+
+  rent_arr = rent_str.split('.')
+  
+  if rent_arr.size != 2
+    'Rent must include dollars, a period, and cents'
+  elsif rent_arr.any? { |str| str.nil? }
+    'Rent must include cents'
+  elsif rent_arr.any? { |str| !is_integer?(str) }
+    'Please enter valid integers for dollars and cents'
+  elsif rent_arr[0].to_i <= 0 || rent_arr[0].to_i > 10000
+    'Please enter a rent amount greater than $0 and less than $10,000'
+  elsif rent_arr[1].to_i < 0 || rent_arr[1].to_i > 99
+    'Please enter valid cents between 0 and 99'
+  end
+end
 
 def signed_in?
   session[:username]
@@ -78,15 +131,10 @@ get '/' do
 end
 
 get '/buildings' do
-  @page = (params[:page] || 1).to_i
   @buildings = @storage.all_buildings
+  @page = load_page(@buildings, params[:page])
 
-  if error = error_for_page(@buildings, @page)
-    session[:message] = error
-    redirect '/buildings'
-  else
-    erb :buildings
-  end
+  erb :buildings
 end
 
 # WORK ON THESE
@@ -116,21 +164,10 @@ end
 get '/buildings/:id' do
   building_id = params[:id]
   @building = load_building(building_id)
-  @page = (params[:page] || 1).to_i
-  
-  if @building.nil?
-    session[:message] = 'Building was not found'
-    redirect '/buildings'
-  end
-
   @apartments = load_apartments(building_id)
+  @page = load_page(@apartments, params[:page])
 
-  if error = error_for_page(@apartments, @page)
-    session[:message] = error
-    redirect "/buildings/#{@building[:id]}"
-  else
-    erb :building
-  end
+  erb :building
 end
 
 get '/buildings/:id/edit' do
@@ -142,24 +179,13 @@ get '/buildings/:id/edit' do
   building_id = params[:id]
   @building = load_building(building_id)
 
-  if @building.nil?
-    session[:message] = 'Building was not found'
-    redirect '/buildings'
-  else
-    erb :edit_building
-  end
+  erb :edit_building
 end
 
-# WORK ON THIS
 post '/buildings/:id/edit' do
   building_id = params[:id]
-  @building = load_building(building_id)
-
-  if @building.nil?
-    redirect_homepage('Building was not found')
-  end
-
   building_name = params[:building_name].strip
+  @building = load_building(building_id)
 
   @storage.update_building(building_id, building_name)
   session[:message] = 'Building was successfully updated'
@@ -170,17 +196,28 @@ post '/buildings/:id/delete' do
   building_id = params[:id]
   @building = load_building(building_id)
 
-  if @building.nil?
-    redirect_homepage('Building was not found')
-  end
-
   @storage.delete_building(@building[:id])
   session[:message] = 'Building was successfully deleted'
   redirect '/buildings'
 end
 
-get '/buildings/:building_id/apartments/new' do
-  
+post '/buildings/:building_id/apartments/new' do
+  building_id = params[:building_id]
+  apartment_number = params[:apartment_number].strip
+  rent = params[:rent].strip
+  tenant = params[:tenant].strip
+
+  @building = load_building(building_id)
+  @apartments = load_apartments(building_id)
+  @page = load_page(@apartments, params[:page])
+
+  if error = error_new_apartment(apartment_number, rent, tenant)
+    session[:message] = error
+    erb :building
+  else
+    session[:message] = 'Apartment successfully added'
+    redirect "/buildings/#{@building[:id]}"
+  end
 end
 
 get '/users/signin' do
@@ -196,7 +233,7 @@ post '/users/signin' do
   username = params[:username].strip
   password = params[:password].strip
 
-  if error = error_for_signin?(username, password)
+  if error = error_signin?(username, password)
     session[:message] = error
     erb :signin
   else

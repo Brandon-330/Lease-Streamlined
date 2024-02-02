@@ -8,6 +8,10 @@
 
 <h1><%= @building[:name] %></h1>
 
+<div>
+  <a href='/buildings/<%= @building[:id] %>/edit'>Edit building</a>
+</div>
+
 <ul>
   <% paginate(@apartments, @page).each do |apartment| %>
     <li>
@@ -33,10 +37,26 @@
   <% end %>
 </div>
 
-<div>
-  <a href='/buildings/<%= @building[:id] %>/apartments/new'>Add apartment</a>
-</div>
+<p>Add new apartment:</p>
 
-<div>
-  <a href='/buildings/<%= @building[:id] %>/edit'>Edit building</a>
-</div>
+<form method='POST' action='/buildings/<%= @building[:id] %>/apartments/new'>
+  <div>
+    <label for='apartment_number'>Apartment number:
+      <input name='apartment_number' value='<%= params[:apartment_number] %>'></input>
+    </label>
+  <div>
+
+  <div>
+    <label for='rent'>Rent:
+      <input name='rent' value='<%= params[:rent] %>'></input>
+    </label>
+  </div>
+
+  <div>
+    <label for='tenant'>Tenant name:
+      <input name='tenant' value='<%= params[:tenant] %>'></input>
+    </label>
+  </div>
+
+  <button type='submit'>Add new apartment</button>
+</form>
