@@ -6,7 +6,7 @@ class Database
     @logger = logger # Logger for developing purposes
   end
 
-  def find_apartment(building_id)
+  def all_apartments(building_id)
     sql = <<~SQL
     SELECT a.number AS apartment_number, a.rent, t.name AS tenant_name
     FROM apartments AS a
@@ -18,6 +18,30 @@ class Database
     result = query(sql, building_id)
 
     format_sql_result_to_list_of_hashes(result)
+  end
+
+  def add_apartment(building_id, apartment_number, rent, tenant_name)
+    # If new apartment will include tenant, execute if statement
+    if !tenant_name.empty?
+      tenant_hsh = find_tenant_by_name(tenant_name)
+      
+      # If tenant does not exist, add new tenant
+      if !tenant_hsh
+        add_tenant(tenant_name)
+        tenant_hsh = find_tenant_by_name(tenant_name)
+      end
+
+      tenant_id = tenant_hsh[:id]
+    end
+
+    tenant_id = tenant_id ? tenant_id : 'DEFAULT'
+
+    sql = <<~SQL
+    INSERT INTO apartments (building_id, number, rent, tenant_id)
+                    VALUES ($1, $2, CAST($3 AS NUMERIC(6, 2)), $4)
+    SQL
+
+    query(sql, building_id, apartment_number, rent, tenant_id)
   end
 
   def all_buildings
@@ -72,15 +96,14 @@ class Database
     query(sql, id)
   end
 
-  # Possible error here
-  def all_tenants
+  def all_occupied_tenants
     sql = <<~SQL
-    SELECT name
+    SELECT *
     FROM tenants
     JOIN apartments ON apartments.tenant_id = tenants.id
     SQL
 
-    result = query(sql, id)
+    result = query(sql)
     
     format_sql_result_to_list_of_hashes(result)
   end
@@ -114,5 +137,26 @@ class Database
 
       tuple_hash
     end
+  end
+
+  def find_tenant_by_name(name)
+    sql = <<~SQL
+    SELECT *
+    FROM tenants
+    WHERE name = $1
+    SQL
+
+    result = query(sql, name)
+
+    format_sql_result_to_list_of_hashes(result).first
+  end
+
+  def add_tenant(name)
+    sql = <<~SQL
+    INSERT INTO tenants (name)
+                  VALUES ($1)
+    SQL
+
+    query(sql, name)
   end
 end

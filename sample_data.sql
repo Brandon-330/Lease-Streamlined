@@ -3,10 +3,10 @@ INSERT INTO credentials (username, password)
                         ('Jezz', '11111'),
                         ('Dav3', '44444');
 
-INSERT INTO tenants (name, status)
-             VALUES ('Eddie', DEFAULT),
-                    ('David', 'false'),
-                    ('Jessica', DEFAULT);
+INSERT INTO tenants (name)
+             VALUES ('Eddie'),
+                    ('David'),
+                    ('Jessica');
 
 INSERT INTO buildings (name)
                 VALUES ('Oakridge'),

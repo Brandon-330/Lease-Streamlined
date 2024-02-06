@@ -5,11 +5,10 @@ CREATE TABLE credentials (
   password text NOT NULL
 );
 
--- Determine name of tenants and if they are active or past renters
+-- Determine name of tenants
 CREATE TABLE tenants (
   id serial PRIMARY KEY,
-  name text NOT NULL,
-  status boolean DEFAULT TRUE
+  name text NOT NULL
 );
 
 CREATE TABLE buildings (

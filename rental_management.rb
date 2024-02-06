@@ -38,7 +38,7 @@ helpers do
   end
 
   def load_apartments(building_id)
-    @storage.find_apartment(building_id)
+    @storage.all_apartments(building_id)
   end
 
   def load_page(content_array, page_param)
@@ -63,7 +63,7 @@ def last_page(content_array)
 end
 
 def is_integer?(string)
-  string.to_i.to_s == string
+  /^[0-9]+$/.match?(string) # String must be or or more number characters at the beginning and end
 end
 
 def error_signin?(username, password)
@@ -90,8 +90,8 @@ def error_new_apartment(apartment_number, rent, tenant=nil)
     error
   elsif error = error_rent(rent)
     error
-  elsif @storage.all_tenants.any? { |tenants_hsh| tenants_hsh[:name] == tenant }
-    'Tenant is already occupying another appartment'
+  elsif @storage.all_occupied_tenants.any? { |tenant_hsh| tenant_hsh[:name] == tenant }
+    'Tenant is already occupying an apartment'
   end
 end
 
@@ -113,8 +113,7 @@ def error_rent(rent_str)
     'Rent must include dollars, a period, and cents'
   elsif rent_arr.any? { |str| str.nil? }
     'Rent must include cents'
-  # CONTINUE HERE
-  elsif rent_arr.any? { |str| !is_integer?(str.gsub(/^0+/, '')) } # Remove leading zeroes
+  elsif rent_arr.any? { |str| !is_integer?(str) }
     'Please enter valid integers for dollars and cents'
   elsif rent_arr[0].to_i <= 0 || rent_arr[0].to_i > 10000
     'Please enter a rent amount greater than $0 and less than $10,000'
@@ -219,6 +218,7 @@ post '/buildings/:building_id/apartments/new' do
     session[:message] = error
     erb :building
   else
+    @storage.add_apartment(building_id, apartment_number, rent, tenant)
     session[:message] = 'Apartment successfully added'
     redirect "/buildings/#{@building[:id]}"
   end
