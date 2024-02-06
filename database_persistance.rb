@@ -34,8 +34,6 @@ class Database
       tenant_id = tenant_hsh[:id]
     end
 
-    tenant_id = tenant_id ? tenant_id : 'DEFAULT'
-
     sql = <<~SQL
     INSERT INTO apartments (building_id, number, rent, tenant_id)
                     VALUES ($1, $2, CAST($3 AS NUMERIC(6, 2)), $4)
@@ -96,11 +94,10 @@ class Database
     query(sql, id)
   end
 
-  def all_occupied_tenants
+  def all_tenants
     sql = <<~SQL
     SELECT *
     FROM tenants
-    JOIN apartments ON apartments.tenant_id = tenants.id
     SQL
 
     result = query(sql)

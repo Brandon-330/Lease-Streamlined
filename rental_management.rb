@@ -66,7 +66,7 @@ def is_integer?(string)
   /^[0-9]+$/.match?(string) # String must be or or more number characters at the beginning and end
 end
 
-def error_signin?(username, password)
+def error_signin(username, password)
   if username.empty? || password.empty?
     return 'Please enter your username and password'
   end
@@ -85,18 +85,22 @@ def error_new_building(name)
   end
 end
 
-def error_new_apartment(apartment_number, rent, tenant=nil)
+def error_new_apartment(building_id, apartment_number, rent, tenant=nil)  
   if error = error_apartment_number(apartment_number)
     error
+  elsif load_apartments(building_id).any? { |apartment| apartment[:apartment_number] == apartment_number }
+    'Apartment number is already taken'
   elsif error = error_rent(rent)
     error
-  elsif @storage.all_occupied_tenants.any? { |tenant_hsh| tenant_hsh[:name] == tenant }
+  elsif @storage.all_tenants.any? { |tenant_hsh| tenant_hsh[:name] == tenant }
     'Tenant is already occupying an apartment'
   end
 end
 
 def error_apartment_number(number_str)
-  if !is_integer?(number_str)
+  if number_str.empty?
+    'Apartment number cannot be empty'
+  elsif !is_integer?(number_str)
     'Apartment number must be all integers'
   elsif number_str.length != 3
     'Apartment number must be three digits in length'
@@ -111,8 +115,8 @@ def error_rent(rent_str)
   
   if rent_arr.size != 2
     'Rent must include dollars, a period, and cents'
-  elsif rent_arr.any? { |str| str.nil? }
-    'Rent must include cents'
+  elsif rent_arr[0].empty?
+    'Rent cannot be empty'
   elsif rent_arr.any? { |str| !is_integer?(str) }
     'Please enter valid integers for dollars and cents'
   elsif rent_arr[0].to_i <= 0 || rent_arr[0].to_i > 10000
@@ -167,10 +171,30 @@ end
 get '/buildings/:id' do
   building_id = params[:id]
   @building = load_building(building_id)
-  @apartments = load_apartments(building_id)
+  @apartments = load_apartments(@building[:id])
   @page = load_page(@apartments, params[:page])
 
   erb :building
+end
+
+post '/buildings/:building_id' do
+  building_id = params[:building_id]
+  apartment_number = params[:apartment_number].strip
+  rent = params[:rent].strip
+  tenant = params[:tenant].strip
+
+  @building = load_building(building_id)
+  @apartments = load_apartments(@building[:id])
+  @page = load_page(@apartments, params[:page])
+
+  if error = error_new_apartment(@building[:id], apartment_number, rent, tenant)
+    session[:message] = error
+    erb :building
+  else
+    @storage.add_apartment(@building[:id], apartment_number, rent, tenant)
+    session[:message] = 'Apartment successfully added'
+    redirect "/buildings/#{@building[:id]}"
+  end
 end
 
 get '/buildings/:id/edit' do
@@ -190,7 +214,7 @@ post '/buildings/:id/edit' do
   building_name = params[:building_name].strip
   @building = load_building(building_id)
 
-  @storage.update_building(building_id, building_name)
+  @storage.update_building(@building[:id], building_name)
   session[:message] = 'Building was successfully updated'
   redirect "/buildings/#{@building[:id]}"
 end
@@ -202,26 +226,6 @@ post '/buildings/:id/delete' do
   @storage.delete_building(@building[:id])
   session[:message] = 'Building was successfully deleted'
   redirect '/buildings'
-end
-
-post '/buildings/:building_id/apartments/new' do
-  building_id = params[:building_id]
-  apartment_number = params[:apartment_number].strip
-  rent = params[:rent].strip
-  tenant = params[:tenant].strip
-
-  @building = load_building(building_id)
-  @apartments = load_apartments(building_id)
-  @page = load_page(@apartments, params[:page])
-
-  if error = error_new_apartment(apartment_number, rent, tenant)
-    session[:message] = error
-    erb :building
-  else
-    @storage.add_apartment(building_id, apartment_number, rent, tenant)
-    session[:message] = 'Apartment successfully added'
-    redirect "/buildings/#{@building[:id]}"
-  end
 end
 
 get '/users/signin' do
@@ -237,7 +241,7 @@ post '/users/signin' do
   username = params[:username].strip
   password = params[:password].strip
 
-  if error = error_signin?(username, password)
+  if error = error_signin(username, password)
     session[:message] = error
     erb :signin
   else

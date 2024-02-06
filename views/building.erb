@@ -37,9 +37,9 @@
   <% end %>
 </div>
 
-<p>Add new apartment:</p>
+<p>Add new apartment?</p>
 
-<form method='POST' action='/buildings/<%= @building[:id] %>/apartments/new'>
+<form method='POST' action='/buildings/<%= @building[:id] %>'>
   <div>
     <label for='apartment_number'>Apartment number:
       <input name='apartment_number' value='<%= params[:apartment_number] %>'></input>

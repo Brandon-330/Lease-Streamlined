@@ -20,7 +20,7 @@ CREATE TABLE buildings (
 -- Establish a M:1 relationship with buildings. If building is deleted, so should its apartments
 CREATE TABLE apartments (
   id serial PRIMARY KEY,
-  number int NOT NULL,
+  number int NOT NULL UNIQUE,
   rent NUMERIC(6, 2) NOT NULL,
   building_id int REFERENCES buildings(id) ON DELETE CASCADE NOT NULL,
   tenant_id int REFERENCES tenants(id) UNIQUE
