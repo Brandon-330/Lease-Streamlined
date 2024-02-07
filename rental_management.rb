@@ -25,6 +25,7 @@ helpers do
   end
 
   def load_building(id)
+    # if id is not an integer, execute this block
     unless is_integer?(id)
       session[:message] = 'Building was not found'
       redirect '/buildings'
@@ -38,7 +39,22 @@ helpers do
   end
 
   def load_apartments(building_id)
+    # building_id parameter has already sanitized input earlier
     @storage.all_apartments(building_id)
+  end
+
+  def load_apartment(building_id, apartment_id)
+    # building_id parameter has already sanitized input, if apartment_id is not an integer execute
+    unless is_integer?(apartment_id)
+      session[:message] = 'Apartment was not found'
+      redirect "/buildings/#{building_id}"
+    end
+
+    apartment = @storage.find_apartment(building_id, apartment_id)
+    return apartment if apartment
+
+    session[:message] = 'Apartment was not found'
+    redirect "/buildings/#{building_id}"
   end
 
   def load_page(content_array, page_param)
@@ -78,7 +94,7 @@ def error_signin(username, password)
 end
 
 def error_new_building(name)
-  if name.nil?
+  if name.empty?
     'Please enter the building name'
   elsif @storage.all_buildings.any? { |building| building[:name] == name }
     'Please enter a unique building name'
@@ -177,8 +193,8 @@ get '/buildings/:id' do
   erb :building
 end
 
-post '/buildings/:building_id' do
-  building_id = params[:building_id]
+post '/buildings/:id' do
+  building_id = params[:id]
   apartment_number = params[:apartment_number].strip
   rent = params[:rent].strip
   tenant = params[:tenant].strip
@@ -226,6 +242,15 @@ post '/buildings/:id/delete' do
   @storage.delete_building(@building[:id])
   session[:message] = 'Building was successfully deleted'
   redirect '/buildings'
+end
+
+get '/buildings/:building_id/apartments/:apartment_id/edit' do
+  building_id = params[:building_id]
+  apartment_id = params[:apartment_id]
+  @building = load_building(building_id)
+  @apartment = load_apartment(@building[:id], apartment_id)
+
+  erb :edit_apartment
 end
 
 get '/users/signin' do

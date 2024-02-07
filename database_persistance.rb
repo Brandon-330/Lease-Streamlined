@@ -8,7 +8,7 @@ class Database
 
   def all_apartments(building_id)
     sql = <<~SQL
-    SELECT a.number AS apartment_number, a.rent, t.name AS tenant_name
+    SELECT a.id, a.number AS apartment_number, a.rent, t.name AS tenant_name
     FROM apartments AS a
     LEFT OUTER JOIN tenants AS t ON t.id = a.tenant_id
     WHERE a.building_id = $1
@@ -18,6 +18,20 @@ class Database
     result = query(sql, building_id)
 
     format_sql_result_to_list_of_hashes(result)
+  end
+
+  def find_apartment(building_id, apartment_id)
+    sql = <<~SQL
+    SELECT a.id, a.number, a.rent, t.id AS tenant_id, t.name AS tenant_name
+    FROM apartments AS a
+    LEFT OUTER JOIN tenants AS t ON t.id = a.tenant_id
+    WHERE a.building_id = $1
+    AND a.id = $2
+    SQL
+
+    result = query(sql, building_id, apartment_id)
+
+    format_sql_result_to_list_of_hashes(result).first
   end
 
   def add_apartment(building_id, apartment_number, rent, tenant_name)

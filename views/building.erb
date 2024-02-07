@@ -21,6 +21,9 @@
       <% else %>
         <b>Vacant</b>
       <% end %>
+      <a href='/buildings/<%= @building[:id] %>/apartments/<%= apartment[:id] %>/edit'>
+        Edit
+      </a>
     </li>
   <% end %>
 </ul>

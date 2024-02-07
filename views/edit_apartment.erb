@@ -1,0 +1,35 @@
+<% content_for :title do %>
+  Edit <%= @apartment[:number] %> at <%= @building[:name] %>
+<% end %>
+
+<% content_for :header_links do %>
+  <a href='/buildings/<%= @building[:id] %>'>Previous Page</a>
+<% end %>
+
+<h1>Editing Apartment <%= @apartment[:number] %> at <%= @building[:name] %></h1>
+
+<form method='POST' action='/buildings/<%= @building[:id] %>/apartments/<%= @apartment[:id] %>/edit'>
+  <div>
+    <label for='number'>Apartment number:
+      <input name='number' value='<%= params[:number] || @apartment[:number] %>'></input>
+    </label>
+  </div>
+
+  <div>
+    <label for='rent'>Rent:
+      <input name='rent' value='<%= params[:rent] || @apartment[:rent] %>'></input>
+    </label>
+  </div>
+
+  <div>
+    <label for='tenant_name'>Tenant:
+      <input name='tenant_name' value='<%= params[:tenant_name] || @apartment[:tenant_name] %>'></input>
+    </label>
+  </div>
+
+  <button type='submit'>Edit apartment</button>
+</form>
+
+<form method='POST' action='/buildings/<%= @building[:id] %>/apartments/<%= @apartment[:id] %>/delete'>
+  <button type='submit'>Delete apartment</button>
+</form>
