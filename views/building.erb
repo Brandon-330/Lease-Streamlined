@@ -12,6 +12,12 @@
   <a href='/buildings/<%= @building[:id] %>/edit'>Edit building</a>
 </div>
 
+<% if @apartments.any? { |apartment| apartment[:tenant_name] } %>
+  <form method='POST' action='/buildings/<%= @building[:id] %>/evict_tenants' style='margin-top: 15px'>
+    <button type='submit'>Evict all tenants</button>
+  </form>
+<% end %>
+
 <ul>
   <% paginate(@apartments, @page).each do |apartment| %>
     <li>

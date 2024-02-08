@@ -56,6 +56,16 @@ class Database
     query(sql, building_id, apartment_number, rent, tenant_id)
   end
 
+  def delete_apartment(building_id, apartment_id)
+    sql = <<~SQL
+    DELETE FROM apartments
+    WHERE building_id = $1
+    AND id = $2
+    SQL
+
+    query(sql, building_id, apartment_id)
+  end
+
   def all_buildings
     sql = <<~SQL
     SELECT id, name
@@ -119,6 +129,25 @@ class Database
     format_sql_result_to_list_of_hashes(result)
   end
 
+  def evict_all_tenants(building_id)
+    sql = <<~SQL
+    UPDATE apartments
+    SET tenant_id = NULL
+    WHERE building_id = $1
+    SQL
+
+    query(sql, building_id)
+  end
+
+  def add_credentials(username, password)
+    sql = <<~SQL
+    INSERT INTO credentials (username, password)
+                      VALUES($1, $2)
+    SQL
+
+    query(sql, username, password)
+  end
+
   def find_credentials(username, password)
     sql = <<~SQL
     SELECT id
@@ -128,6 +157,17 @@ class Database
     SQL
 
     result = query(sql, username, password)
+
+    format_sql_result_to_list_of_hashes(result)
+  end
+
+  def all_usernames
+    sql = <<~SQL
+    SELECT username
+    FROM credentials
+    SQL
+
+    result = query(sql)
 
     format_sql_result_to_list_of_hashes(result)
   end

@@ -82,12 +82,15 @@ def is_integer?(string)
   /^[0-9]+$/.match?(string) # String must be or or more number characters at the beginning and end
 end
 
+# CONTINUE HERE
 def error_signin(username, password)
   if username.empty? || password.empty?
     return 'Please enter your username and password'
   end
 
-  result = @storage.find_credentials(username, password)
+  bcrypt_password = BCrypt::Password.create(password)
+
+  result = @storage.find_credentials(username, bcrypt_password)
   if result.size == 0
     return 'User not found'
   end
@@ -235,6 +238,15 @@ post '/buildings/:id/edit' do
   redirect "/buildings/#{@building[:id]}"
 end
 
+post '/buildings/:building_id/evict_tenants' do
+  building_id = params[:id]
+  @building = load_building(building_id)
+
+  @storage.evict_all_tenants(@building[:id])
+  session[:message] = "All tenants in #{@building[:name]} have been evicted"
+  redirect '/buildings/'
+end
+
 post '/buildings/:id/delete' do
   building_id = params[:id]
   @building = load_building(building_id)
@@ -253,15 +265,36 @@ get '/buildings/:building_id/apartments/:apartment_id/edit' do
   erb :edit_apartment
 end
 
+# WORK ON THIS
+post '/buildings/:building_id/apartments/:apartment_id/edit' do
+  building_id = params[:building_id]
+  apartment_id = params[:apartment_id]
+  @building = load_building(building_id)
+  @apartment = load_apartment(@building[:id], apartment_id)
+
+  apartment_number = params[:number].strip
+  rent = params[:rent].strip
+  tenant_name = params[:tenant_name].strip
+
+  session[:message] = 'Apartment was successfully updated'
+  redirect "/buildings/#{@building[:id]}"
+end
+
+post '/buildings/:building_id/apartments/:apartment_id/delete' do
+  building_id = params[:building_id]
+  apartment_id = params[:apartment_id]
+  @building = load_building(building_id)
+  @apartment = load_apartment(@building[:id], apartment_id)
+
+  @storage.delete_apartment(@building[:id], @apartment[:id])
+  session[:message] = 'Apartment was successfully deleted'
+  redirect "/buildings/#{@building[:id]}"
+end
+
 get '/users/signin' do
   erb :signin
 end
 
-get '/users/signup' do
-  erb :signup
-end
-
-# ENCRYPT PASSWORD
 post '/users/signin' do
   username = params[:username].strip
   password = params[:password].strip
@@ -273,6 +306,30 @@ post '/users/signin' do
     session[:username] = username
     session[:message] = 'Successfully signed in'
     redirect '/buildings'
+  end
+end
+
+get '/users/signup' do
+  erb :signup
+end
+
+post '/users/signup' do
+  username = params[:username]
+  password = params[:password]
+
+  if username.empty? || password.empty?
+    session[:message] = 'Please enter a valid username and password'
+    erb :signup
+  elsif username.include?(' ') || password.include?(' ')
+    session[:message] = 'Please do not include spaces in username/password'
+    erb :signup
+  elsif @storage.all_usernames.any? { |account| account[:username] == username  }
+    session[:message] = 'Username already taken'
+    erb :signup
+  else
+    @storage.add_credentials(username, BCrypt::Password.create(password))
+    session[:message] = 'Account successfully created'
+    redirect '/users/signin'
   end
 end
 
