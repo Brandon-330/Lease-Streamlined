@@ -82,17 +82,16 @@ def is_integer?(string)
   /^[0-9]+$/.match?(string) # String must be or or more number characters at the beginning and end
 end
 
-# CONTINUE HERE
 def error_signin(username, password)
   if username.empty? || password.empty?
     return 'Please enter your username and password'
   end
 
-  bcrypt_password = BCrypt::Password.create(password)
-
-  result = @storage.find_credentials(username, bcrypt_password)
+  result = @storage.find_credentials(username)
   if result.size == 0
     return 'User not found'
+  elsif BCrypt::Password.new(result[:password]) != password
+    return 'Invalid credentials'
   end
 end
 

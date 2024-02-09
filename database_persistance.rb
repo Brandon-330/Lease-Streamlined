@@ -148,17 +148,16 @@ class Database
     query(sql, username, password)
   end
 
-  def find_credentials(username, password)
+  def find_credentials(username)
     sql = <<~SQL
-    SELECT id
+    SELECT id, username, password
     FROM credentials
     WHERE username = $1
-    AND password = $2
     SQL
 
-    result = query(sql, username, password)
+    result = query(sql, username)
 
-    format_sql_result_to_list_of_hashes(result)
+    format_sql_result_to_list_of_hashes(result).first
   end
 
   def all_usernames
