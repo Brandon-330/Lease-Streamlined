@@ -117,6 +117,8 @@ def error_new_apartment(building_id, apartment_number, rent, tenant=nil)
     'Apartment number is already taken'
   elsif error = error_rent(rent)
     error
+  elsif error = error_tenant(tenant)
+    error
   elsif @storage.all_apartments(building_id).any? { |apartment| apartment[:tenant_name] == tenant }
     'Tenant is already occupying an apartment'
   end
@@ -149,6 +151,10 @@ def error_rent(rent_str)
   elsif rent_arr[1].to_i < 0 || rent_arr[1].to_i > 99
     'Please enter valid cents between 0 and 99'
   end
+end
+
+def error_tenant(tenant_str)
+  'Invalid tenant name' if /[0-9]/.match?(tenant_str)
 end
 
 before do
@@ -276,11 +282,27 @@ post '/buildings/:building_id/apartments/:apartment_id/edit' do
   rent = params[:rent].strip
   tenant_name = params[:tenant_name].strip
 
-  if error = error_apartment_number
+  if @apartment[:number] == apartment_number && @apartment[:rent] == rent && @apartment[:tenant_name] == tenant_name
+    session[:message] = 'No changes has been made'
+  elsif error = error_apartment_number(apartment_number)
+    session[:message] = error
+  # Accept same apartment number as before
+  elsif load_apartments(@building[:id]).reject { |apartment| apartment[:number] == @apartment[:number] }.any? { |apartment| apartment[:number] == apartment_number }
+    session[:message] = 'Apartment number is already taken'
+  elsif error = error_rent(rent)
+    session[:message] = error
+  elsif error = error_tenant(tenant_name)
+    session[:message] = error
+  # Something awfully wrong is going on here
+  elsif @storage.all_apartments(@building[:id]).reject { |apartment| apartment[:tenant_name] == @apartment[:tenant_name] }.any? { |apartment| apartment[:tenant_name] == tenant_name }
+    'Tenant is already occupying an apartment'
+  else
+    @storage.update_apartment(@building[:id], @apartment[:id], apartment_number, rent, tenant_name)
+    session[:message] = 'Apartment was successfully updated'
+    redirect "/buildings/#{@building[:id]}"
   end
 
-  session[:message] = 'Apartment was successfully updated'
-  redirect "/buildings/#{@building[:id]}"
+  erb :edit_apartment
 end
 
 post '/buildings/:building_id/apartments/:apartment_id/delete' do

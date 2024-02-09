@@ -35,18 +35,7 @@ class Database
   end
 
   def add_apartment(building_id, apartment_number, rent, tenant_name)
-    # If new apartment will include tenant, execute if statement
-    if !tenant_name.empty?
-      tenant_hsh = find_tenant_by_name(tenant_name)
-      
-      # If tenant does not exist, add new tenant
-      if !tenant_hsh
-        add_tenant(tenant_name)
-        tenant_hsh = find_tenant_by_name(tenant_name)
-      end
-
-      tenant_id = tenant_hsh[:id]
-    end
+    tenant_id = add_new_or_existing_tenant(tenant_name)
 
     sql = <<~SQL
     INSERT INTO apartments (building_id, number, rent, tenant_id)
@@ -54,6 +43,19 @@ class Database
     SQL
 
     query(sql, building_id, apartment_number, rent, tenant_id)
+  end
+
+  def update_apartment(building_id, apartment_id, apartment_number, rent, tenant_name)
+    tenant_id = add_new_or_existing_tenant(tenant_name)
+
+    sql = <<~SQL
+    UPDATE apartments
+    SET number = $1, rent = $2, tenant_id = $3
+    WHERE building_id = $4
+    AND id = $5
+    SQL
+
+    query(sql, apartment_number, rent, tenant_id, building_id, apartment_id)
   end
 
   def delete_apartment(building_id, apartment_id)
@@ -197,5 +199,23 @@ class Database
     SQL
 
     query(sql, name)
+  end
+
+  def add_new_or_existing_tenant(tenant_name)
+    tenant_id = nil
+    # If new apartment will include tenant, execute if statement
+    if !tenant_name.empty?
+      tenant_hsh = find_tenant_by_name(tenant_name)
+      
+      # If tenant does not exist, add new tenant
+      if !tenant_hsh
+        add_tenant(tenant_name)
+        tenant_hsh = find_tenant_by_name(tenant_name)
+      end
+
+      tenant_id = tenant_hsh[:id]
+    end
+
+    tenant_id
   end
 end
