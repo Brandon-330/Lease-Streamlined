@@ -24,6 +24,13 @@ helpers do
     content_array[content_idx, CONTENT_PER_PAGE]
   end
 
+  def check_signed_in
+    unless session[:username]
+      session[:message] = 'You must be signed in to view this page'
+      redirect '/users/signin'
+    end
+  end
+
   def load_building(id)
     # if id is not an integer, execute this block
     unless is_integer?(id)
@@ -88,7 +95,7 @@ def error_signin(username, password)
   end
 
   result = @storage.find_credentials(username)
-  if result.size == 0
+  if result.nil?
     return 'User not found'
   elsif BCrypt::Password.new(result[:password]) != password
     return 'Invalid credentials'
@@ -144,10 +151,6 @@ def error_rent(rent_str)
   end
 end
 
-def signed_in?
-  session[:username]
-end
-
 before do
   @storage = Database.new(logger)
 end
@@ -164,12 +167,9 @@ get '/buildings' do
 end
 
 get '/buildings/new' do
-  if !signed_in?
-    session[:message] = 'You must be signed in to view this page'
-    redirect '/users/signin'
-  else
-    erb :new_building
-  end
+  check_signed_in
+  
+  erb :new_building
 end
 
 # WORK ON THIS
@@ -187,6 +187,8 @@ post '/buildings/new' do
 end
 
 get '/buildings/:id' do
+  check_signed_in
+
   building_id = params[:id]
   @building = load_building(building_id)
   @apartments = load_apartments(@building[:id])
@@ -216,10 +218,7 @@ post '/buildings/:id' do
 end
 
 get '/buildings/:id/edit' do
-  if !signed_in?
-    session[:message] = 'You must be signed in to view this page'
-    redirect '/users/signin'
-  end
+  check_signed_in
 
   building_id = params[:id]
   @building = load_building(building_id)
@@ -229,7 +228,7 @@ end
 
 post '/buildings/:id/edit' do
   building_id = params[:id]
-  building_name = params[:building_name].strip
+  building_name = params[:name].strip
   @building = load_building(building_id)
 
   @storage.update_building(@building[:id], building_name)
@@ -256,6 +255,8 @@ post '/buildings/:id/delete' do
 end
 
 get '/buildings/:building_id/apartments/:apartment_id/edit' do
+  check_signed_in
+
   building_id = params[:building_id]
   apartment_id = params[:apartment_id]
   @building = load_building(building_id)
@@ -274,6 +275,9 @@ post '/buildings/:building_id/apartments/:apartment_id/edit' do
   apartment_number = params[:number].strip
   rent = params[:rent].strip
   tenant_name = params[:tenant_name].strip
+
+  if error = error_apartment_number
+  end
 
   session[:message] = 'Apartment was successfully updated'
   redirect "/buildings/#{@building[:id]}"
@@ -309,6 +313,8 @@ post '/users/signin' do
 end
 
 get '/users/signup' do
+  check_signed_in
+
   erb :signup
 end
 
