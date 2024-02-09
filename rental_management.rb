@@ -110,7 +110,7 @@ def error_new_apartment(building_id, apartment_number, rent, tenant=nil)
     'Apartment number is already taken'
   elsif error = error_rent(rent)
     error
-  elsif @storage.all_tenants.any? { |tenant_hsh| tenant_hsh[:name] == tenant }
+  elsif @storage.all_apartments(building_id).any? { |apartment| apartment[:tenant_name] == tenant }
     'Tenant is already occupying an apartment'
   end
 end
@@ -237,13 +237,13 @@ post '/buildings/:id/edit' do
   redirect "/buildings/#{@building[:id]}"
 end
 
-post '/buildings/:building_id/evict_tenants' do
+post '/buildings/:id/evict_tenants' do
   building_id = params[:id]
   @building = load_building(building_id)
 
   @storage.evict_all_tenants(@building[:id])
   session[:message] = "All tenants in #{@building[:name]} have been evicted"
-  redirect '/buildings/'
+  redirect "/buildings/#{@building[:id]}"
 end
 
 post '/buildings/:id/delete' do

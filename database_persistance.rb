@@ -118,17 +118,6 @@ class Database
     query(sql, id)
   end
 
-  def all_tenants
-    sql = <<~SQL
-    SELECT *
-    FROM tenants
-    SQL
-
-    result = query(sql)
-    
-    format_sql_result_to_list_of_hashes(result)
-  end
-
   def evict_all_tenants(building_id)
     sql = <<~SQL
     UPDATE apartments
