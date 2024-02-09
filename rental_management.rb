@@ -124,6 +124,8 @@ def error_new_apartment(building_id, apartment_number, rent, tenant=nil)
   end
 end
 
+def error_update_apartment(building_id, apartment_number, rent, tenant=nil)
+
 def error_apartment_number(number_str)
   if number_str.empty?
     'Apartment number cannot be empty'
@@ -207,7 +209,7 @@ post '/buildings/:id' do
   building_id = params[:id]
   apartment_number = params[:apartment_number].strip
   rent = params[:rent].strip
-  tenant = params[:tenant].strip
+  tenant = params[:tenant].strip.capitalize
 
   @building = load_building(building_id)
   @apartments = load_apartments(@building[:id])
@@ -280,7 +282,7 @@ post '/buildings/:building_id/apartments/:apartment_id/edit' do
 
   apartment_number = params[:number].strip
   rent = params[:rent].strip
-  tenant_name = params[:tenant_name].strip
+  tenant_name = params[:tenant_name].strip.capitalize
 
   if @apartment[:number] == apartment_number && @apartment[:rent] == rent && @apartment[:tenant_name] == tenant_name
     session[:message] = 'No changes has been made'
@@ -295,7 +297,7 @@ post '/buildings/:building_id/apartments/:apartment_id/edit' do
     session[:message] = error
   # Something awfully wrong is going on here
   elsif @storage.all_apartments(@building[:id]).reject { |apartment| apartment[:tenant_name] == @apartment[:tenant_name] }.any? { |apartment| apartment[:tenant_name] == tenant_name }
-    'Tenant is already occupying an apartment'
+    session[:message] = 'Tenant is already occupying an apartment'
   else
     @storage.update_apartment(@building[:id], @apartment[:id], apartment_number, rent, tenant_name)
     session[:message] = 'Apartment was successfully updated'
