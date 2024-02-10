@@ -134,10 +134,12 @@ class Database
   end
 
   def evict_all_tenants(building_id)
+    # ON DELETE SET NULL condition in apartments automatically updates apartments accordingly
     sql = <<~SQL
-    UPDATE apartments
-    SET tenant_id = NULL
-    WHERE building_id = $1
+    DELETE FROM tenants
+    WHERE id IN (SELECT tenant_id
+                 FROM apartments
+                 WHERE building_id = $1)
     SQL
 
     query(sql, building_id)
@@ -209,15 +211,17 @@ class Database
   end
 
   def add_tenant(name)
-    sql = <<~SQL
-    INSERT INTO tenants (name)
-                  VALUES ($1)
-                  RETURNING id;
-    SQL
+    unless name.empty?
+      sql = <<~SQL
+      INSERT INTO tenants (name)
+                    VALUES ($1)
+                    RETURNING id;
+      SQL
 
-    result = query(sql, name)
+      result = query(sql, name)
 
-    tenant_id = format_sql_result_to_list_of_hashes(result).first[:id]
+      tenant_id = format_sql_result_to_list_of_hashes(result).first[:id]
+    end
   end
 
   def delete_tenant(tenant_id)

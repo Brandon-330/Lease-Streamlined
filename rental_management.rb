@@ -106,7 +106,7 @@ def error_new_building(name)
   if name.empty?
     'Please enter the building name'
   elsif @storage.all_buildings.any? { |building| building[:name] == name }
-    'Please enter a unique building name'
+    "Building name #{name} already taken"
   end
 end
 
@@ -114,13 +114,13 @@ def error_new_apartment(building_id, apartment_number, rent, tenant=nil)
   if error = error_apartment_number(apartment_number)
     error
   elsif load_apartments(building_id).any? { |apartment| apartment[:number] == apartment_number }
-    'Apartment number is already taken'
+    "Apartment number #{apartment_number} is already taken"
   elsif error = error_rent(rent)
     error
   elsif error = error_tenant(tenant)
     error
   elsif @storage.all_apartments(building_id).any? { |apartment| apartment[:tenant_name] == tenant }
-    'Tenant is already occupying an apartment'
+    "#{tenant} is already occupying an apartment in this building"
   end
 end
 
@@ -134,14 +134,14 @@ def error_update_apartment(apartment_hsh, apartment_number, rent, tenant=nil)
     error
   # Accept same apartment number as before
   elsif load_apartments(building_id).reject { |iterating_apartment| iterating_apartment[:id] == apartment_hsh[:id] }.any? { |iterating_apartment| iterating_apartment[:number] == apartment_number }
-    'Apartment number is already taken'
+    "Apartment number #{apartment_number} is already taken"
   elsif error = error_rent(rent)
     error
   elsif error = error_tenant(tenant)
     error
   # Something awfully wrong is going on here
   elsif @storage.all_apartments(building_id).reject { |iterating_apartment| iterating_apartment[:id] == apartment_hsh[:id] }.any? { |iterating_apartment| iterating_apartment[:tenant_name] == tenant }
-    'Tenant is already occupying an apartment'
+    "#{tenant} is already occupying an apartment in this building"
   end
 end
 
