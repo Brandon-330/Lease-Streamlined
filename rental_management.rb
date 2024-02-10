@@ -124,7 +124,7 @@ def error_new_apartment(building_id, apartment_number, rent, tenant=nil)
   end
 end
 
-def error_update_apartment(apartment_hsh, apartment_number, rent, tenant=nil)
+def error_update_apartment(apartment_hsh, apartment_number, rent, tenant_name=nil)
   building_id = apartment_hsh[:building_id]
   apartmnet_id = apartment_hsh[:id]
 
@@ -292,7 +292,6 @@ get '/buildings/:building_id/apartments/:apartment_id/edit' do
   erb :edit_apartment
 end
 
-# WORK ON THIS
 post '/buildings/:building_id/apartments/:apartment_id/edit' do
   building_id = params[:building_id]
   apartment_id = params[:apartment_id]

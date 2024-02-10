@@ -21,7 +21,7 @@
 <ul>
   <% paginate(@apartments, @page).each do |apartment| %>
     <li>
-      Apartment number: <%= apartment[:apartment_number] %> Rent: $<%= apartment[:rent] %> 
+      Apartment number: <%= apartment[:number] %> Rent: $<%= apartment[:rent] %> 
       <% if apartment[:tenant_name] %>
         Tenant: <%= apartment[:tenant_name] %>
       <% else %>
