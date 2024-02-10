@@ -35,7 +35,7 @@ class Database
   end
 
   def add_apartment(building_id, apartment_number, rent, tenant_name)
-    tenant_id = add_new_or_existing_tenant(tenant_name)
+    tenant_id = add_tenant(tenant_name)
 
     sql = <<~SQL
     INSERT INTO apartments (building_id, number, rent, tenant_id)
@@ -48,8 +48,12 @@ class Database
   def update_apartment(apartment_hsh, apartment_number, rent, tenant_name)
     building_id = apartment_hsh[:building_id]
     apartment_id = apartment_hsh[:id]
+    tenant_id = apartment_hsh[:tenant_id]
     
-    tenant_id = add_new_or_existing_tenant(tenant_name)
+    if tenant_name != apartment_hsh[:tenant_name]
+      delete_tenant(tenant_id)
+      tenant_id = add_tenant(tenant_name)
+    end
 
     sql = <<~SQL
     UPDATE apartments
@@ -64,6 +68,7 @@ class Database
   def delete_apartment(apartment_hsh)
     building_id = apartment_hsh[:building_id]
     apartment_id = apartment_hsh[:id]
+    tenant_id = apartment_hsh[:tenant_id]
 
     sql = <<~SQL
     DELETE FROM apartments
@@ -72,11 +77,13 @@ class Database
     SQL
 
     query(sql, building_id, apartment_id)
+
+    delete_tenant(tenant_id)
   end
 
   def all_buildings
     sql = <<~SQL
-    SELECT id, name
+    SELECT *
     FROM buildings
     ORDER BY name ASC
     SQL
@@ -88,7 +95,7 @@ class Database
 
   def find_building(id)
     sql = <<~SQL
-    SELECT id, name
+    SELECT *
     FROM buildings 
     WHERE id = $1
     SQL
@@ -149,7 +156,7 @@ class Database
 
   def find_credentials(username)
     sql = <<~SQL
-    SELECT id, username, password
+    SELECT *
     FROM credentials
     WHERE username = $1
     SQL
@@ -186,14 +193,17 @@ class Database
     end
   end
 
-  def find_tenant_by_name(name)
+  def find_tenant_by_name_for_building(name, building_id)
     sql = <<~SQL
     SELECT *
     FROM tenants
     WHERE name = $1
+    AND id IN (SELECT tenant_id
+               FROM apartments
+               WHERE building_id = $2)
     SQL
 
-    result = query(sql, name)
+    result = query(sql, name, building_id)
 
     format_sql_result_to_list_of_hashes(result).first
   end
@@ -202,26 +212,20 @@ class Database
     sql = <<~SQL
     INSERT INTO tenants (name)
                   VALUES ($1)
+                  RETURNING id;
     SQL
 
-    query(sql, name)
+    result = query(sql, name)
+
+    tenant_id = format_sql_result_to_list_of_hashes(result).first[:id]
   end
 
-  def add_new_or_existing_tenant(tenant_name)
-    tenant_id = nil
-    # If new apartment will include tenant, execute if statement
-    if !tenant_name.empty?
-      tenant_hsh = find_tenant_by_name(tenant_name)
-      
-      # If tenant does not exist, add new tenant
-      if !tenant_hsh
-        add_tenant(tenant_name)
-        tenant_hsh = find_tenant_by_name(tenant_name)
-      end
+  def delete_tenant(tenant_id)
+    sql = <<~SQL
+    DELETE FROM tenants
+    WHERE id = $1
+    SQL
 
-      tenant_id = tenant_hsh[:id]
-    end
-
-    tenant_id
+    query(sql, tenant_id)
   end
 end

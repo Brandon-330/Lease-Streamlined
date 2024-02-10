@@ -259,7 +259,7 @@ post '/buildings/:id/edit' do
   @building = load_building(building_id)
 
   if @building[:name] == building_name
-    session[:message] = 'No changes made'
+    session[:message] = 'No changes has been made'
     erb :edit_building
   else
     @storage.update_building(@building[:id], building_name)
