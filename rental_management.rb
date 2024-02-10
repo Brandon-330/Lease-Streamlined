@@ -201,7 +201,7 @@ end
 
 # WORK ON THIS
 post '/buildings/new' do
-  building_name = params[:name].strip
+  building_name = params[:name].strip.split.map(&:capitalize).join(' ')
 
   if error = error_new_building(building_name)
     session[:message] = error
@@ -255,12 +255,17 @@ end
 
 post '/buildings/:id/edit' do
   building_id = params[:id]
-  building_name = params[:name].strip
+  building_name = params[:name].strip.split.map(&:capitalize).join(' ')
   @building = load_building(building_id)
 
-  @storage.update_building(@building[:id], building_name)
-  session[:message] = 'Building was successfully updated'
-  redirect "/buildings/#{@building[:id]}"
+  if @building[:name] == building_name
+    session[:message] = 'No changes made'
+    erb :edit_building
+  else
+    @storage.update_building(@building[:id], building_name)
+    session[:message] = 'Building was successfully updated'
+    redirect "/buildings/#{@building[:id]}"
+  end
 end
 
 post '/buildings/:id/evict_tenants' do
@@ -327,6 +332,8 @@ get '/users/signin' do
   if session[:username]
     session[:message] = 'Already logged in'
     redirect '/buildings'
+  elsif @storage.all_usernames.empty?
+    redirect '/users/signup'
   else
     erb :signin
   end

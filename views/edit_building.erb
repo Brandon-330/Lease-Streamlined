@@ -10,8 +10,8 @@
 
 <form method='POST' action='/buildings/<%= @building[:id] %>/edit'>
   <div>
-    <label for='building_name'>Building name:
-      <input name='building_name' value='<%= params[:name] || @building[:name] %>'></input>
+    <label for='name'>Building name:
+      <input name='name' value='<%= params[:name] || @building[:name] %>'></input>
     </label>
   </div>
   
