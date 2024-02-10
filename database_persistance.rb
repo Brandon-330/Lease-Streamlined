@@ -220,7 +220,7 @@ class Database
 
       result = query(sql, name)
 
-      tenant_id = format_sql_result_to_list_of_hashes(result).first[:id]
+      format_sql_result_to_list_of_hashes(result).first[:id] # Tenant id
     end
   end
 
