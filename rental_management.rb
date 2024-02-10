@@ -124,23 +124,23 @@ def error_new_apartment(building_id, apartment_number, rent, tenant=nil)
   end
 end
 
-def error_update_apartment(apartment_hsh, apartment_number, rent, tenant_name=nil)
+def error_update_apartment(apartment_hsh, apartment_number, rent, tenant=nil)
   building_id = apartment_hsh[:building_id]
-  apartmnet_id = apartment_hsh[:id]
+  apartment_id = apartment_hsh[:id]
 
-  if apartment_hsh[:number] == apartment_number && apartment_hsh[:rent] == rent && apartment_hsh[:tenant_name] == tenant_name
+  if apartment_hsh[:number] == apartment_number && apartment_hsh[:rent] == rent && apartment_hsh[:tenant_name] == tenant
     'No changes has been made'
   elsif error = error_apartment_number(apartment_number)
     error
   # Accept same apartment number as before
-  elsif load_apartments(building_id).reject { |iterating_apartment| iterating_apartment[:number] == apartment_hsh[:number] }.any? { |iterating_apartment| iterating_apartment[:number] == apartment_number }
+  elsif load_apartments(building_id).reject { |iterating_apartment| iterating_apartment[:id] == apartment_hsh[:id] }.any? { |iterating_apartment| iterating_apartment[:number] == apartment_number }
     'Apartment number is already taken'
   elsif error = error_rent(rent)
     error
-  elsif error = error_tenant(tenant_name)
+  elsif error = error_tenant(tenant)
     error
   # Something awfully wrong is going on here
-  elsif @storage.all_apartments(@building_id).reject { |iterating_apartment| iterating_apartment[:tenant_name] == apartment_hsh[:tenant_name] }.any? { |iterating_apartment| iterating_apartment[:tenant_name] == tenant_name }
+  elsif @storage.all_apartments(building_id).reject { |iterating_apartment| iterating_apartment[:id] == apartment_hsh[:id] }.any? { |iterating_apartment| iterating_apartment[:tenant_name] == tenant }
     'Tenant is already occupying an apartment'
   end
 end
@@ -303,7 +303,7 @@ post '/buildings/:building_id/apartments/:apartment_id/edit' do
   tenant_name = params[:tenant_name].strip.capitalize
 
   if error = error_update_apartment(@apartment, apartment_number, rent, tenant_name)
-    sesion[:message] = error
+    session[:message] = error
     erb :edit_apartment
   else
     @storage.update_apartment(@apartment, apartment_number, rent, tenant_name)

@@ -23,5 +23,5 @@ CREATE TABLE apartments (
   number int NOT NULL,
   rent NUMERIC(6, 2) NOT NULL,
   building_id int REFERENCES buildings(id) ON DELETE CASCADE NOT NULL,
-  tenant_id int REFERENCES tenants(id) UNIQUE
+  tenant_id int REFERENCES tenants(id)
 );
