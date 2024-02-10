@@ -16,7 +16,7 @@ CREATE TABLE buildings (
   name text NOT NULL
 );
 
--- Establish a 1:1 relationship with renters. If renter is deleted, building may stay
+-- Establish a 1:1 relationship with renters. If renter is deleted, building has NULL tenant_id
 -- Establish a M:1 relationship with buildings. If building is deleted, so should its apartments
 CREATE TABLE apartments (
   id serial PRIMARY KEY,

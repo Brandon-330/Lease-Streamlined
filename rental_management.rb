@@ -17,11 +17,10 @@ configure(:development) do
 end
 
 helpers do 
-  CONTENT_PER_PAGE = 5
   # Create pagination for an array of content
   def paginate(content_array, page_number)
-    content_idx = (page_number - 1) * CONTENT_PER_PAGE
-    content_array[content_idx, CONTENT_PER_PAGE]
+    content_idx = (page_number - 1) * content_per_page
+    content_array[content_idx, content_per_page]
   end
 
   def check_signed_in
@@ -75,10 +74,14 @@ helpers do
   end
 end
 
+def content_per_page
+  5
+end
+
 # Last page to be used during pagination
 def last_page(content_array)
   page_number = 1
-  while page_number * CONTENT_PER_PAGE < content_array.size
+  while page_number * content_per_page < content_array.size
     page_number += 1
   end
 
