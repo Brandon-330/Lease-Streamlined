@@ -113,7 +113,7 @@ end
 def error_new_apartment(building_id, apartment_number, rent, tenant=nil)  
   if error = error_apartment_number(apartment_number)
     error
-  elsif load_apartments(building_id).any? { |apartment| apartment[:apartment_number] == apartment_number }
+  elsif load_apartments(building_id).any? { |apartment| apartment[:number] == apartment_number }
     'Apartment number is already taken'
   elsif error = error_rent(rent)
     error
@@ -124,7 +124,26 @@ def error_new_apartment(building_id, apartment_number, rent, tenant=nil)
   end
 end
 
-def error_update_apartment(building_id, apartment_number, rent, tenant=nil)
+def error_update_apartment(apartment_hsh, apartment_number, rent, tenant=nil)
+  building_id = apartment_hsh[:building_id]
+  apartmnet_id = apartment_hsh[:id]
+
+  if apartment_hsh[:number] == apartment_number && apartment_hsh[:rent] == rent && apartment_hsh[:tenant_name] == tenant_name
+    'No changes has been made'
+  elsif error = error_apartment_number(apartment_number)
+    error
+  # Accept same apartment number as before
+  elsif load_apartments(building_id).reject { |iterating_apartment| iterating_apartment[:number] == apartment_hsh[:number] }.any? { |iterating_apartment| iterating_apartment[:number] == apartment_number }
+    'Apartment number is already taken'
+  elsif error = error_rent(rent)
+    error
+  elsif error = error_tenant(tenant_name)
+    error
+  # Something awfully wrong is going on here
+  elsif @storage.all_apartments(@building_id).reject { |iterating_apartment| iterating_apartment[:tenant_name] == apartment_hsh[:tenant_name] }.any? { |iterating_apartment| iterating_apartment[:tenant_name] == tenant_name }
+    'Tenant is already occupying an apartment'
+  end
+end
 
 def error_apartment_number(number_str)
   if number_str.empty?
@@ -284,27 +303,14 @@ post '/buildings/:building_id/apartments/:apartment_id/edit' do
   rent = params[:rent].strip
   tenant_name = params[:tenant_name].strip.capitalize
 
-  if @apartment[:number] == apartment_number && @apartment[:rent] == rent && @apartment[:tenant_name] == tenant_name
-    session[:message] = 'No changes has been made'
-  elsif error = error_apartment_number(apartment_number)
-    session[:message] = error
-  # Accept same apartment number as before
-  elsif load_apartments(@building[:id]).reject { |apartment| apartment[:number] == @apartment[:number] }.any? { |apartment| apartment[:number] == apartment_number }
-    session[:message] = 'Apartment number is already taken'
-  elsif error = error_rent(rent)
-    session[:message] = error
-  elsif error = error_tenant(tenant_name)
-    session[:message] = error
-  # Something awfully wrong is going on here
-  elsif @storage.all_apartments(@building[:id]).reject { |apartment| apartment[:tenant_name] == @apartment[:tenant_name] }.any? { |apartment| apartment[:tenant_name] == tenant_name }
-    session[:message] = 'Tenant is already occupying an apartment'
+  if error = error_update_apartment(@apartment, apartment_number, rent, tenant_name)
+    sesion[:message] = error
+    erb :edit_apartment
   else
-    @storage.update_apartment(@building[:id], @apartment[:id], apartment_number, rent, tenant_name)
+    @storage.update_apartment(@apartment, apartment_number, rent, tenant_name)
     session[:message] = 'Apartment was successfully updated'
     redirect "/buildings/#{@building[:id]}"
   end
-
-  erb :edit_apartment
 end
 
 post '/buildings/:building_id/apartments/:apartment_id/delete' do
@@ -313,13 +319,18 @@ post '/buildings/:building_id/apartments/:apartment_id/delete' do
   @building = load_building(building_id)
   @apartment = load_apartment(@building[:id], apartment_id)
 
-  @storage.delete_apartment(@building[:id], @apartment[:id])
+  @storage.delete_apartment(@apartment)
   session[:message] = 'Apartment was successfully deleted'
   redirect "/buildings/#{@building[:id]}"
 end
 
 get '/users/signin' do
-  erb :signin
+  if session[:username]
+    session[:message] = 'Already logged in'
+    redirect '/buildings'
+  else
+    erb :signin
+  end
 end
 
 post '/users/signin' do
@@ -337,8 +348,12 @@ post '/users/signin' do
 end
 
 get '/users/signup' do
-  check_signed_in
-
+  if @storage.all_usernames.empty?
+    session[:message] = 'Select initial admin username and password'
+  else
+    check_signed_in
+  end
+  
   erb :signup
 end
 

@@ -8,7 +8,7 @@ class Database
 
   def all_apartments(building_id)
     sql = <<~SQL
-    SELECT a.id, a.number AS apartment_number, a.rent, t.name AS tenant_name
+    SELECT a.*, t.name AS tenant_name
     FROM apartments AS a
     LEFT OUTER JOIN tenants AS t ON t.id = a.tenant_id
     WHERE a.building_id = $1
@@ -22,7 +22,7 @@ class Database
 
   def find_apartment(building_id, apartment_id)
     sql = <<~SQL
-    SELECT a.id, a.number, a.rent, t.id AS tenant_id, t.name AS tenant_name
+    SELECT a.*, t.id AS tenant_id, t.name AS tenant_name
     FROM apartments AS a
     LEFT OUTER JOIN tenants AS t ON t.id = a.tenant_id
     WHERE a.building_id = $1
@@ -45,7 +45,10 @@ class Database
     query(sql, building_id, apartment_number, rent, tenant_id)
   end
 
-  def update_apartment(building_id, apartment_id, apartment_number, rent, tenant_name)
+  def update_apartment(apartment_hsh, apartment_number, rent, tenant_name)
+    building_id = apartment_hsh[:building_id]
+    apartment_id = apartment_hsh[:id]
+    
     tenant_id = add_new_or_existing_tenant(tenant_name)
 
     sql = <<~SQL
@@ -58,7 +61,10 @@ class Database
     query(sql, apartment_number, rent, tenant_id, building_id, apartment_id)
   end
 
-  def delete_apartment(building_id, apartment_id)
+  def delete_apartment(apartment_hsh)
+    building_id = apartment_hsh[:building_id]
+    apartment_id = apartment_hsh[:id]
+
     sql = <<~SQL
     DELETE FROM apartments
     WHERE building_id = $1
@@ -130,13 +136,15 @@ class Database
     query(sql, building_id)
   end
 
-  def add_credentials(username, password)
+  def all_usernames
     sql = <<~SQL
-    INSERT INTO credentials (username, password)
-                      VALUES($1, $2)
+    SELECT username
+    FROM credentials
     SQL
 
-    query(sql, username, password)
+    result = query(sql)
+
+    format_sql_result_to_list_of_hashes(result)
   end
 
   def find_credentials(username)
@@ -151,15 +159,13 @@ class Database
     format_sql_result_to_list_of_hashes(result).first
   end
 
-  def all_usernames
+  def add_credentials(username, password)
     sql = <<~SQL
-    SELECT username
-    FROM credentials
+    INSERT INTO credentials (username, password)
+                      VALUES($1, $2)
     SQL
 
-    result = query(sql)
-
-    format_sql_result_to_list_of_hashes(result)
+    query(sql, username, password)
   end
 
   private

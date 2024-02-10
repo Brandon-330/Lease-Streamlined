@@ -1,8 +1,3 @@
-INSERT INTO credentials (username, password)
-                 VALUES ('Edd1e', '12345'),
-                        ('Jezz', '11111'),
-                        ('Dav3', '44444');
-
 INSERT INTO tenants (name)
              VALUES ('Eddie'),
                     ('David'),

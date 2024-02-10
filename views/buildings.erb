@@ -30,9 +30,12 @@
   <a href='/buildings/new'>Add building</a>
 </div>
 
-<div>
+<div> 
   <% if session[:username] %>
     <p>Signed in as: <%= session[:username] %></p>
+    
+    <a href='/users/signup'>Add admin user</a>
+
     <form method='post' action='/users/signout'>
       <button type='submit'>Sign Out</button>
     </form>
