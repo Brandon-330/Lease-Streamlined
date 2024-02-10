@@ -51,19 +51,19 @@
 <form method='POST' action='/buildings/<%= @building[:id] %>'>
   <div>
     <label for='apartment_number'>Apartment number:
-      <input name='apartment_number' value='<%= params[:apartment_number] %>'></input>
+      <input name='apartment_number' id='apartment_number' value='<%= params[:apartment_number] %>'>
     </label>
-  <div>
+  </div>
 
   <div>
     <label for='rent'>Rent:
-      <input name='rent' value='<%= params[:rent] %>'></input>
+      <input name='rent' id='rent' value='<%= params[:rent] %>'>
     </label>
   </div>
 
   <div>
     <label for='tenant'>Tenant name (if any):
-      <input name='tenant' value='<%= params[:tenant] %>'></input>
+      <input name='tenant' id='tenant' value='<%= params[:tenant] %>' id='tenant'>
     </label>
   </div>
 

@@ -11,7 +11,7 @@
 <form method='POST' action='/buildings/<%= @building[:id] %>/edit'>
   <div>
     <label for='name'>Building name:
-      <input name='name' value='<%= params[:name] || @building[:name] %>'></input>
+      <input name='name' id='name' value='<%= params[:name] || @building[:name] %>'>
     </label>
   </div>
   

@@ -11,19 +11,19 @@
 <form method='POST' action='/buildings/<%= @building[:id] %>/apartments/<%= @apartment[:id] %>/edit'>
   <div>
     <label for='number'>Apartment number:
-      <input name='number' value='<%= params[:number] || @apartment[:number] %>'></input>
+      <input name='number' id='number' value='<%= params[:number] || @apartment[:number] %>'>
     </label>
   </div>
 
   <div>
     <label for='rent'>Rent:
-      <input name='rent' value='<%= params[:rent] || @apartment[:rent] %>'></input>
+      <input name='rent' id='rent' value='<%= params[:rent] || @apartment[:rent] %>'>
     </label>
   </div>
 
   <div>
     <label for='tenant_name'>Tenant:
-      <input name='tenant_name' value='<%= params[:tenant_name] || @apartment[:tenant_name] %>'></input>
+      <input name='tenant_name' id='tenant_name' value='<%= params[:tenant_name] || @apartment[:tenant_name] %>'>
     </label>
   </div>
 
