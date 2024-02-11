@@ -37,9 +37,9 @@ PLATFORMS
   x64-mingw-ucrt
 
 DEPENDENCIES
-  bcrypt
+  bcrypt (= 3.1.20)
   erubis
-  pg
+  pg (= 1.5.4)
   rackup
   sinatra
   sinatra-contrib
