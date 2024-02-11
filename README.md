@@ -37,7 +37,7 @@ bundler will run in accordance with the specifications presented within Gemfile.
 This application can run by entering the following command in the terminal:
 
 ```bash
-ruby rental_management.rb
+ruby lease_streamlined.rb
 ```
 
 The application can then be accessed and tested in a web browser with the following URL: *localhost:4567*
@@ -52,7 +52,7 @@ For database purposes, this application used PostgreSQL version 16.1.
 
 #### **Possible Complications**
 
-If there is a database error, make sure the database created is named *apartments_rental_management*. In addition, the database in this application attempts to sign in to PostgreSQL through the default *postgres* user (with a default *postgres* password). 
+If there is a database error, make sure the database created is named *lease_streamlined*. In addition, the database in this application attempts to sign in to PostgreSQL through the default *postgres* user (with a default *postgres* password). 
 
 ## **Owner**
 
