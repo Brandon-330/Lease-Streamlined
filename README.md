@@ -1,8 +1,8 @@
-# Lease Streamlined
+# **Lease Streamlined**
 
 Lease Streamlined is an apartments rental management web application with a focus for rental management companies.
 
-## Description
+## **Description**
 
 Lease Streamlined is designed for small and midsized rental management companies. LS is able to track various unique building names and their respective apartments. This application also tracks tenants unique to each apartment within a building. For future considerations, this application added a separate tenants relation in the event detailed tenant information is requested per the client/user.
 
@@ -12,11 +12,11 @@ For viewing purposes, this application restricts 5 buildings and/or apartments p
 
 As a bonus feature, this application requests for the first signup to be the admin. From there, the admin, once logged in, has the liberty to add other admin users to use the application. Once logged in, an admin has the liberty to log out. All password credentials has been encrypted with the BCrypt gem
 
-### Limitations
+### **Limitations**
 
 Lease Streamlined has been designed with a limitation that each building name must be unique, apartment numbers must be unique, and each building has unique tenant names. To avoid this unlikely scenario, creating nicknames for tenants is an effective solution while the application is being updated to accomodate for this scenario.
 
-## Installation
+## **Installation**
 
 To use the application make sure to have installed the bundler gem prior to using the application.
 
@@ -32,7 +32,7 @@ bundle install
 
 bundler will run in accordance with the specifications presented within Gemfile.
 
-### Running Application
+### **Running Application**
 
 This application can run by entering the following command in the terminal:
 
@@ -40,9 +40,9 @@ This application can run by entering the following command in the terminal:
 ruby rental_management.rb
 ```
 
-The application can then be accessed and tested in a web browser with the following URL: "localhost:4567"
+The application can then be accessed and tested in a web browser with the following URL: *localhost:4567*
 
-### Testing Application
+### **Testing Application**
 
 This application used ruby version 3.2.2 as stated in the Gemfile. 
 
@@ -50,10 +50,10 @@ To test this application, this application used Google Chrome Version 121.0.6167
 
 For database purposes, this application used PostgreSQL version 16.1.
 
-#### Possible Complications
+#### **Possible Complications**
 
-If there is a database error, make sure the database created is named "apartments_rental_management". In addition, the database in this application attempts to sign in to PostgreSQL through the default "postgres" user (with a default "postgres" password). 
+If there is a database error, make sure the database created is named *apartments_rental_management*. In addition, the database in this application attempts to sign in to PostgreSQL through the default *postgres* user (with a default *postgres* password). 
 
-## Owner
+## **Owner**
 
 Brandon Lima
