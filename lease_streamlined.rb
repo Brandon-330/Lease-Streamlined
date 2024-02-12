@@ -23,7 +23,7 @@ helpers do
     content_array[content_idx, content_per_page]
   end
 
-  def check_signed_in_from(url)
+  def check_signed_in_from(url=nil)
     unless session[:username]
       session[:message] = 'You must be signed in to view this page'
       redirect "/users/signin?from=#{url}"
@@ -203,7 +203,7 @@ get '/buildings' do
 end
 
 get '/buildings/new' do
-  check_signed_in
+  check_signed_in_from('/buildings/new')
   
   erb :new_building
 end
@@ -369,7 +369,7 @@ get '/users/signup' do
   if @storage.all_usernames.empty?
     session[:message] = 'Select initial admin username and password'
   else
-    check_signed_in
+    check_signed_in_from
   end
   
   erb :signup
