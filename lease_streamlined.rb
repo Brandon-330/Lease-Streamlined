@@ -23,10 +23,10 @@ helpers do
     content_array[content_idx, content_per_page]
   end
 
-  def check_signed_in
+  def check_signed_in_from(url)
     unless session[:username]
       session[:message] = 'You must be signed in to view this page'
-      redirect '/users/signin'
+      redirect "/users/signin?from=#{url}"
     end
   end
 
@@ -64,6 +64,12 @@ helpers do
   end
 
   def load_page(content_array, page_param)
+    # Throw error if input contains a string, and all characters are not integers
+    if !page_param.nil? && !is_integer?(page_param)
+      session[:message] = 'Page does not exist'
+      redirect '/buildings'
+    end
+
     page = (page_param || 1).to_i
     if page <= 0 || page > last_page(content_array)
       session[:message] = 'Page does not exist'
@@ -202,7 +208,6 @@ get '/buildings/new' do
   erb :new_building
 end
 
-# WORK ON THIS
 post '/buildings/new' do
   building_name = params[:name].strip.split.map(&:capitalize).join(' ')
 
@@ -217,7 +222,7 @@ post '/buildings/new' do
 end
 
 get '/buildings/:id' do
-  check_signed_in
+  check_signed_in_from("/buildings/#{params[:id]}")
 
   building_id = params[:id]
   @building = load_building(building_id)
@@ -248,7 +253,7 @@ post '/buildings/:id' do
 end
 
 get '/buildings/:id/edit' do
-  check_signed_in
+  check_signed_in_from("/buildings/#{params[:id]}/edit")
 
   building_id = params[:id]
   @building = load_building(building_id)
@@ -263,6 +268,9 @@ post '/buildings/:id/edit' do
 
   if @building[:name] == building_name
     session[:message] = 'No changes has been made'
+    erb :edit_building
+  elsif error = error_new_building(building_name)
+    session[:message] = error
     erb :edit_building
   else
     @storage.update_building(@building[:id], building_name)
@@ -290,7 +298,7 @@ post '/buildings/:id/delete' do
 end
 
 get '/buildings/:building_id/apartments/:apartment_id/edit' do
-  check_signed_in
+  check_signed_in_from("/buildings/#{params[:building_id]}/apartments/#{params[:apartment_id]}/edit")
 
   building_id = params[:building_id]
   apartment_id = params[:apartment_id]
@@ -343,6 +351,7 @@ get '/users/signin' do
 end
 
 post '/users/signin' do
+  url = params[:from]
   username = params[:username].strip
   password = params[:password].strip
 
@@ -352,7 +361,7 @@ post '/users/signin' do
   else
     session[:username] = username
     session[:message] = 'Successfully signed in'
-    redirect '/buildings'
+    redirect (url || '/buildings')
   end
 end
 
