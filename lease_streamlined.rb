@@ -1,3 +1,4 @@
+require 'bundler/setup' # Uses Gemfile.lock to load the proper versions of each Gem
 require 'sinatra'
 require 'sinatra/contrib' # To implement Sinatra reloader
 require 'erubis' # To escape HTML for user input

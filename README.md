@@ -32,6 +32,14 @@ bundle install
 
 bundler will run in accordance with the specifications presented within Gemfile.
 
+### **Database Installation**
+
+To make sure the database can be accessed prior to running the application, it is important to create the database beforehand. Therefore, make sure to run the following on your terminal:
+
+```bash
+psql -U postgres
+```
+
 ### **Running Application**
 
 This application can run by entering the following command in the terminal:
@@ -51,6 +59,12 @@ To test this application, this application used Google Chrome Version 121.0.6167
 For database purposes, this application used PostgreSQL version 16.1.
 
 #### **Possible Complications**
+
+If there is a Gem LoadError, make sure to run the following in your terminal:
+
+```bash
+bundle exec
+``` 
 
 If there is a database error, make sure the database created is named *lease_streamlined*. In addition, the database in this application attempts to sign in to PostgreSQL through the default *postgres* user (with a default *postgres* password). 
 
