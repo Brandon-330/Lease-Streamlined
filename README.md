@@ -34,13 +34,13 @@ bundler will run in accordance with the specifications presented within Gemfile.
 
 ### **Database Installation**
 
-To make sure the database can be accessed prior to running the application, it is important to create the database beforehand. Therefore, with the default *postgres* user and *postgres* password, create the database form your bash terminal:
+To make sure the database can be accessed prior to running the application, it is important to create the database beforehand. Therefore, with the default *postgres* user and *postgres* password, create the database form your cmd terminal:
 
 ```bash
-createdb lease_streamlined;
+createdb lease_streamlined
 ```
 
-From here, you can load the seed data from the *seed.sql* file to the database by entering the following statement in your bash terminal:
+From here, you can load the seed data from the *seed.sql* file to the database by entering the following statement in your cmd terminal:
 
 ```bash
 psql lease_streamlined < seed.sql
@@ -48,7 +48,7 @@ psql lease_streamlined < seed.sql
 
 ### **Running Application**
 
-This application can run by entering the following command in the terminal:
+This application is now ready to run by entering the following command in the terminal:
 
 ```bash
 ruby lease_streamlined.rb
@@ -72,7 +72,7 @@ If there is a Gem LoadError, make sure to run the following in your terminal:
 bundle exec
 ``` 
 
-If there is a database error, make sure the database created is named *lease_streamlined*. In addition, the database in this application attempts to sign in to PostgreSQL through the default *postgres* user (with a default *postgres* password). 
+In addition, the database in this application attempts to sign in to PostgreSQL through the default *postgres* user (with a default *postgres* password).
 
 ## **Owner**
 
