@@ -34,10 +34,16 @@ bundler will run in accordance with the specifications presented within Gemfile.
 
 ### **Database Installation**
 
-To make sure the database can be accessed prior to running the application, it is important to create the database beforehand. Therefore, make sure to run the following on your terminal:
+To make sure the database can be accessed prior to running the application, it is important to create the database beforehand. Therefore, with the default *postgres* user and *postgres* password, create the database form your bash terminal:
 
 ```bash
-psql -U postgres
+createdb lease_streamlined;
+```
+
+From here, you can load the seed data from the *seed.sql* file to the database by entering the following statement in your bash terminal:
+
+```bash
+psql lease_streamlined < seed.sql
 ```
 
 ### **Running Application**

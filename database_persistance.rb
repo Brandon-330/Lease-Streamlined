@@ -2,7 +2,7 @@ require 'pg'
 
 class Database
   def initialize(logger)
-    @db = PG.connect(dbname: 'lease_streamlined', user: 'admin')
+    @db = PG.connect(dbname: 'lease_streamlined', user: 'postgres', password: 'postgres')
     @logger = logger # Logger for developing purposes
   end
 
