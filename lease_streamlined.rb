@@ -3,6 +3,7 @@ require 'sinatra'
 require 'sinatra/contrib' # To implement Sinatra reloader
 require 'erubis' # To escape HTML for user input
 require 'bcrypt' # Encrypt passwords
+require 'securerandom' # To set secret session
 
 require_relative 'database_persistance'
 
@@ -177,7 +178,7 @@ def error_rent(rent_str)
     'Rent cannot be empty'
   elsif rent_arr.any? { |str| !is_integer?(str) }
     'Please enter valid integers for dollars and cents'
-  elsif rent_arr[0].to_i <= 0 || rent_arr[0].to_i > 10000
+  elsif rent_arr[0].to_i <= 0 || rent_arr[0].to_i > 9999
     'Please enter a rent amount greater than $0 and less than $10,000'
   elsif rent_arr[1].to_i < 0 || rent_arr[1].to_i > 99
     'Please enter valid cents between 0 and 99'
@@ -341,10 +342,9 @@ post '/buildings/:building_id/apartments/:apartment_id/delete' do
 end
 
 get '/users/signin' do
-  if session[:username]
-    session[:message] = 'Already logged in'
-    redirect '/buildings'
-  elsif @storage.all_usernames.empty?
+  session.delete(:username) if session[:username]
+
+  if @storage.all_usernames.empty?
     redirect '/users/signup'
   else
     erb :signin
